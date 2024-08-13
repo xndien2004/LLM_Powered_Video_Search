@@ -10,7 +10,7 @@ import os
 load_dotenv()
 
 
-def translate(text, to_lang='en'):
+def translate_lib(text, to_lang='en'):
     """
     Translates the input text from the source language to the target language.
 
@@ -76,16 +76,42 @@ def translate_Gemini(text, to_lang = 'en'):
     return response.text
 
 
-# Testing
-text = "Xin chào, tôi là một sinh viên đại học"
+# def translate(text, to_lang='en'):
+#     try:
+#         translation = translate_OpenAI(text, to_lang)
+#         print("Translated by OpenAI")
+#     except Exception as e1:
+#         print(f"OpenAI translation failed: {e1}")
+#         try:
+#             translation = translate_Gemini(text, to_lang)
+#             print("Translated by Gemini")
+#         except Exception as e2:
+#             print(f"Gemini translation failed: {e2}")
+#             translation = translate_lib(text, to_lang)
+#             print("Translated by Google Translate Library")
+#     return translation
 
-try : 
-    print(translate_OpenAI(text))
-    print("Dịch bằng OpenAI")
-except :
-    try :
-        print(translate_Gemini(text))
-        print("Dịch bằng Gemini")
-    except :
-        print(translate(text))
-        print("Dịch bằng thư viện Google Translate")
+# Testing
+# text = "Xin chào, tôi là một sinh viên đại học"
+# print(translate(text))
+
+class translate:
+    def __init__(self):
+        # Initialize any resources required for translation here
+        pass
+    
+    def __call__(self, text,to_lang='en'):
+        to_lang = 'en'
+        try:
+            translation = translate_OpenAI(text, to_lang)
+            print("Translated by OpenAI")
+        except Exception as e1:
+            print(f"OpenAI translation failed: {e1}")
+            try:
+                translation = translate_Gemini(text, to_lang)
+                print("Translated by Gemini")
+            except Exception as e2:
+                print(f"Gemini translation failed: {e2}")
+                translation = translate_lib(text, to_lang)
+                print("Translated by Google Translate Library")
+        return translation
