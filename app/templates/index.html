@@ -1,0 +1,1673 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Faster United</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" /> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">  
+    <link rel="stylesheet" href="{% static 'css/navLeft.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/navRight.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+    <!-- Google Fonts Link For Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-name">Faster United</div>
+            <div class="advanced-container">
+                <p>Advanced</p>
+                <button id="toggleNav">On</button>
+                <button id="showImage" class="main-change-active">Image</button>
+                <button id="showPropose">Propose</button>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search">
+                <div class="search-box-header">
+                    <input class="number-search" placeholder="Number search..." value="100" style="border-right: 1px solid #ddd;">
+                    <textarea  class="text-search" id="text-search" placeholder="Search text query..." rows="1" cols="50"></textarea>
+                    <button class="btn-image-search">
+                        <svg viewBox="0 0 24 24" focusable="false" height="24" width="24">
+                            <path d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M21,9v4h-2V9c0-1.1-0.9-2-2-2H7C5.9,7,5,7.9,5,9v3H3V9c0-2.21,1.79-4,4-4h2l1-2h4l1,2h2C19.21,5,21,6.79,21,9z M12,21H7 c-2.21,0-4-1.79-4-4v-2h2v2c0,1.1,0.9,2,2,2h5V21z M18,16c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,16,18,16z M12,10 c1.66,0,3,1.34,3,3s-1.34,3-3,3s-3-1.34-3-3S10.34,10,12,10z" fill="black"></path>
+                        </svg>
+                    </button>
+                    <!-- <button class="btn-load-query" title="Load text query">
+                        <i class="fas fa-upload"></i>
+                    </button>
+                    <input type="file" id="fileInput" accept=".txt" style="display: none;"> -->
+                    <button class="btn-text-search" title="Search text query">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="load-image">
+                        <div class="dropzone" id="dropzone">
+                            <p>Drag and drop a file here or click to select one.</p>
+                            <input type="file" id="image-file-search" accept="image/png, image/jpeg, image/gif" multiple>
+                        </div>
+                        <div class="next-scene-image-container">
+                            <div class="next-scene-image-name">Next scence:</div>
+                            <input type="checkbox" id="next-scene-image-query" title="Next scene image query">
+                        </div>
+                        <input id="paste-image" placeholder="Paste your image here">
+                    </div>
+                    <div class="preview">
+                        <img id="preview-image" src="" alt="Image preview" style="display:none;" loading="lazy">
+                    </div>
+                </div>                              
+                <div class="actions" style="display: none;"> 
+                    <select id="options">
+                        <option value="All">All</option>
+                        <option value="L01">L01</option>
+                        <option value="L02">L02</option>
+                        <option value="L03">L03</option>
+                        <option value="L04">L04</option>
+                        <option value="L05">L05</option>
+                        <option value="L06">L06</option>
+                        <option value="L07">L07</option>
+                        <option value="L08">L08</option>
+                        <option value="L09">L09</option>
+                        <option value="L10">L10</option>
+                        <option value="L11">L11</option>
+                        <option value="L12">L12</option>
+                        <option value="L13">L13</option>
+                        <option value="L14">L14</option>
+                        <option value="L15">L15</option>
+                        <option value="L16">L16</option>
+                        <option value="L17">L17</option>
+                        <option value="L18">L18</option>
+                        <option value="L19">L19</option>
+                        <option value="L20">L20</option>
+                        <option value="L21">L21</option>
+                        <option value="L22">L22</option>
+                        <option value="L23">L23</option>
+                        <option value="L24">L24</option>
+                    </select>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="asr" class="menu-choice">
+                        <div class="menu-name">ASR</div>
+                    </div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="ocr" class="menu-choice">
+                        <div class="menu-name">OCR</div>
+                    </div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="openclip" class="menu-choice" checked>
+                        <div class="menu-name">Open</div>
+                    </div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="evalip" class="menu-choice">
+                        <div class="menu-name">Eva</div>
+                    </div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="caption" class="menu-choice">
+                        <div class="menu-name">Caption</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" class="re-rank" title="Next scene text query">
+                        <div class="menu-name">Next scene</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="extra" class="choice-extra">
+                        <div class="menu-name">Extra</div>
+                    </div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="no_extra" class="choice-extra" checked>
+                        <div class="menu-name">No extra</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="llm">LLM</div>
+                    <div class="re-ranking">Re rank</div>
+                    <div class="feelback-container">Feelback</div>
+                </div>
+            </div>
+        </div>
+        <div class="main-change-tab">
+            <div class="main-change-tab-child">
+                <input type="text" class="name-query" value="query-data" placeholder="Name query">
+                <input type="text" class="name-QA" placeholder="Q&A">
+                <button id="download-query" title="Download Query">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <nav id="navLeft" class="nav-left">
+            <!-- Navigation content -->
+            <div class="sidebarGrid">
+                <div class="advanced" style="display: block;">
+                    <div id="palette" class="palette">
+                        <div class="search-box">
+                            <input class="search-icon" placeholder="Search object...">
+                        </div>
+                        <div class="icon-container">
+                            <!-- Objects -->
+
+                            <!-- <div class="icon-box" data-img-src="{% static 'image/icon/airplane.png' %}">
+                                <img id="plane" src="{% static 'image/icon/airplane.png' %}" title="airplane">
+                                <div class="name-icon">Plane</div>
+                            </div> -->
+                            
+                        </div>
+                        <div class="search-color-box">
+                            <input class="search-color" placeholder="Search color...">
+                        </div>
+                        <div class="color-container">
+                            <!-- Color -->
+
+                            <!-- <div class="color-box" data-img-src="{% static 'image/icon/blue.png' %}">
+                                <img id="blue" src="{% static 'image/icon/blue.png' %}" title="blue">
+                                <div class="name-color">blue</div>
+                            </div> -->
+                            
+                        </div>
+                    </div>
+                    <div id="searchTab">
+                        <div class="scene0" id="canvasTab">
+                            <div class="">
+                                <div id="description_objects0">
+                                    <div class="font-large font-bold">
+                                        <i id="sceneDes0" class="fa fa-hourglass-start"> Objects &amp; colors &amp; tags</i> <input class="next-scene-objects" type="checkbox" title="Next scene objects">
+                                    </div>
+                                    <div class="function-container">
+                                        <div class="add-tag-bboxes" title="Add tag">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                                            </svg>
+                                        </div>
+                                        <div class="canvasCleanItem" title="Delete object">
+                                            <i class="fa fa-trash"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="block0" style="position: relative; display: block;">
+                                <div id="canvasBlock0" class="advanced" style="display: block;">
+                                    <div id="canvasdiv1">
+                                        <div class="">
+                                            <canvas id="canvas0" class="lower-canvas"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="number-search-container">
+                                <div class="number-search-child">
+                                    <textarea class="number-search-bbox" placeholder="bbox ex: person2 tie2 ..."></textarea>
+                                    <textarea class="number-search-tag" placeholder="tag ex: image2 building2 ..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                   <div class="tag-container">
+                        <div class="tag-child">
+                            <input class="tag-search" placeholder="Search tag...">
+                            <div class="tag-box">
+                                <!-- Tags -->
+                                <!-- <div class="tag" data-tag="tag_1">Tag 1</div>
+                                <div class="tag" data-tag="tag_2">Tag 2</div> -->
+                            </div>
+                        </div>
+                        <div class="tag-child">
+                            <div class="tag-select-choice" style="margin: 5px 0 0 5px;">
+                                <div class="tag-select-label">Select tag <input class="next-scene-tag" type="checkbox" title="Next scene tag"></div>
+                                <div class="delete-tag-choice" title="Delete tag choice">
+                                    <i class="fa fa-trash"></i>
+                                </div>
+                            </div> 
+                            <div class="tag-select-box">
+                                <!-- Select tags -->
+                                <!-- <div class="tag-select" data-tag="1">Select tag 1</div> -->
+                            </div>
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </nav>
+        <div></div>
+        <main>
+            <!-- loader -->
+            <div class="loader" style="display: none;"></div>
+            <!-- propose -->
+            <div class="propose-grid-container" id="proposeContent">
+                <!-- list propose -->
+                <!-- <div class="propose-container">
+                    <div class="propose-name">L01_V001</div>
+                    <div class="propose-grid">
+                        <div class="image-block">
+                            <div class="id-frame">ID frame</div>
+                            <img src="{{ MEDIA_URL }}Keyframes/Keyframes_L01/keyframes/L01_V001/001.jpg" alt="Image 2"> 
+                            <div class="enlarge-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                
+            </div>
+            <!-- Image grid -->
+            <div class="image-grid" id="imageContent">
+                <!-- list image -->
+                <!-- <div class="image-block">
+                    <div class="id-frame">ID frame</div>
+                    <img src="{{ MEDIA_URL }}Keyframes/Keyframes_L01/keyframes/L01_V001/001.jpg" alt="Image 2"> 
+                    <div class="like-dislike-icon">
+                        <i class="fas fa-thumbs-up like" id="like-id" title="Like"></i>
+                        <i class="fas fa-thumbs-down dislike" id="dislike-id" title="Dislike"></i>
+                    </div>
+                    <div class="eye-slash-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+                            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                            <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+                          </svg>
+                    </div>
+                    <div class="enlarge-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/>
+                        </svg>
+                    </div>
+                </div>  -->
+            </div>
+        </main>
+        <!-- navright -->
+        <nav id="navRight" class="nav-right" style="display: none;">
+            <!-- Navigation content -->
+            <div class="right-container">
+                <div class="right-header">
+                    <div class="header-title">
+                        <div class="right-id-video">ID video</div>
+                        <div>-</div>
+                        <div class="right-id-frame">ID Frame</div>
+                    </div>
+
+                    <div class="change-tab">
+                        <button id="showFrame" class="active-change">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54L1 12.5v-9a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                        </button>
+                        <button id="showVideo">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-caret-right-square-fill" viewBox="0 0 16 16">
+                                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm5.5 10a.5.5 0 0 0 .832.374l4.5-4a.5.5 0 0 0 0-.748l-4.5-4A.5.5 0 0 0 5.5 4z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- close nav-right -->
+                    <div class="close-nav-right">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M8 7.121L2.879 2 1.465 3.414 6.586 8 1.465 12.586 2.879 14 8 9.879l5.121 4.121 1.414-1.414L9.414 8 14.536 2.879 13.121 1.465z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="right-main">
+                    <div class="right-image">
+                        <div id="videoContent" class="right-video-container">
+                            <iframe src="https://youtube.com/embed/HNsRpkryGXA?start=1004" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div id="frameContent" class="right-frame-container active">
+                            <div class="right-image-child">
+                                <img src="{{ MEDIA_URL }}DataSampleAIC23/keyframes/L01_V001/0001.jpg" alt="Image 1" loading="lazy">
+                                <div class="right-image-search" title="Frame search">
+                                    <svg viewBox="0 0 24 24" focusable="false" height="24" width="24">
+                                        <path d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M21,9v4h-2V9c0-1.1-0.9-2-2-2H7C5.9,7,5,7.9,5,9v3H3V9c0-2.21,1.79-4,4-4h2l1-2h4l1,2h2C19.21,5,21,6.79,21,9z M12,21H7 c-2.21,0-4-1.79-4-4v-2h2v2c0,1.1,0.9,2,2,2h5V21z M18,16c1.1,0,2,0.9,2,2s-0.9,2-2,2s-2-0.9-2-2S16.9,16,18,16z M12,10   c1.66,0,3,1.34,3,3s-1.34,3-3,3s-3-1.34-3-3S10.34,10,12,10z" fill="white"></path>
+                                    </svg>            
+                                </div>
+                                <div class="right-zoom-in"><i class="fas fa-expand"></i></div>
+                            </div>
+                            <div class="cluster-frames">
+                                <input type="range" min="-10" max="10" value="0" class="cluster-frame-process">
+                            </div>
+                        </div>
+                        <div class="right-info">
+                            <div class="right-info-child">
+                                <div class="right-info-item">
+                                    <div class="right-title-name">Title:</div>
+                                    <div class="right-title">60 Giây Sáng - Ngày 01/12/2022 - HTV Tin Tức Mới Nhất</div>
+                                </div>
+                                <div class="right-info-item">
+                                    <div class="right-author-name">Author:</div>
+                                    <div class="right-author">60 Giây Official</div>
+                                </div>
+                                <div class="right-info-item">
+                                    <div class="right-length-name">Length:</div>
+                                    <div class="right-length">1109</div>
+                                </div>
+                                <div class="right-info-item">
+                                    <div class="right-channel_url-name">Channel url:</div>
+                                    <a class="right-channel_url" href="https://www.youtube.com/channel/UCRjzfa1E0gA50lvDQipbDMg" target="_blank">https://www.youtube.com/channel/UCRjzfa1E0gA50lvDQipbDMg</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="right-recommend">
+                        <!-- image search cluster -->
+                    </div>
+                </div>
+             </div>
+        </nav>
+        <!-- navright chatbot -->
+        <div class="chatbot-container">
+            <button class="chatbot-toggler">
+                <span class="material-symbols-rounded">mode_comment</span>
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="chatbot">
+                <header>
+                    <h2>Chatbot</h2>
+                    <span class="close-btn material-symbols-outlined">close</span>
+                </header>
+                <ul class="chatbox">
+                    <li class="chat incoming">
+                        <span class="material-symbols-outlined">smart_toy</span>
+                        <div class="bot-reply">
+                            <p>Hi there <br>How can I help you today?</p>
+                            <div class="chatbot-image-grid">
+                                <!-- <div class="chatbot-image-block">
+                                    <div class="chatbot-id-frame">ID frame</div>
+                                    <img src="{{ MEDIA_URL }}Keyframes/Keyframes_L01/keyframes/L01_V001/001.jpg" alt="Image 2"> 
+                                </div> -->
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="chat-input">
+                    <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
+                    <span id="send-btn" class="material-symbols-rounded">send</span>
+                </div>
+            </div>
+        </div>
+        <!-- Tag search -->
+        <div class="tag-search-bboxes-container">
+            <div class="tag-search-bboxes-label">
+                <div class="tag-search-bboxes-title">Tag name</div>
+                <div class="tag-search-bboxes-close">x</div>
+            </div>
+            <div class="tag-search-bboxes-child">
+                <input class="tag-search-bboxes" placeholder="Search tag...">
+            </div>
+        </div>
+
+        <!-- Filter for list image -->
+        <div class="filter-container">
+            <div class="filter-btn" onclick="toggleSlider()" title="Filter list image">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+                    <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+                </svg>
+            </div>
+            <div class="slider-container" style="display: none;">
+                <input type="range" min="50" max="200" value="135" class="slider" id="slider" oninput="updateValue()">
+                <span id="slider-value" class="slider-value">135</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="{% static 'js/others.js' %}"></script>
+    <script src="{% static 'js/loadObject.js' %}"></script>
+    <script src="{% static 'js/jquery_colect.js' %}"></script>
+    <script> 
+    // cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    function getYoutubeVideoId(url) {
+        const regex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    }
+
+    function fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE) {
+        fetch('/api/cluster_frames/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ videoId, index_frame, is_extra }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                const { cluster_frames_path, video_info, start_time, ID_frame } = data;
+                const n = cluster_frames_path.length;
+                const navRight = document.querySelector('.nav-right');
+                navRight.style.display = 'block';
+
+                const clusterFrameProcess = navRight.querySelector('.cluster-frame-process');
+                clusterFrameProcess.max = n-1;
+                clusterFrameProcess.min = 0;
+                clusterFrameProcess.value = ID_frame;
+
+                // const dict = Array.from({ length: n }, (_, i) => i).map(i => i + 1).reduce((acc, i, idx) => ({ ...acc, [i]: cluster_frames_path[idx] }), {});
+
+                const updateImageAndTitle = value => {
+                    const imageBlock = navRight.querySelector('.right-image img');
+                    imageBlock.src = `{{ MEDIA_URL }}${cluster_frames_path[value]}`;
+                    const frameId = cluster_frames_path[value].split('/').pop().split('.')[0];
+                    navRight.querySelector('.header-title').innerHTML = `
+                        <div class="right-id-video">${videoId}</div>
+                        <div>-</div>
+                        <div class="right-id-frame">${frameId}</div>
+                    `;
+                };
+
+                updateImageAndTitle(ID_frame);
+                clusterFrameProcess.addEventListener('input', e => updateImageAndTitle(e.target.value));
+
+
+                // update video info
+                const rightInfo = navRight.querySelector('.right-info');
+                const rightTitle = rightInfo.querySelector('.right-title');
+                const rightAuthor = rightInfo.querySelector('.right-author');
+                const rightLength = rightInfo.querySelector('.right-length');
+                const rightChannelUrl = rightInfo.querySelector('.right-channel_url');
+
+                rightTitle.textContent = video_info.title;
+                rightAuthor.textContent = video_info.author;
+                rightLength.textContent = `${video_info.length} seconds`;
+                rightChannelUrl.href = video_info.channel_url;
+
+                // update video 
+                const videoContent = navRight.querySelector('.right-video-container iframe');
+                const videoIdYoutube = getYoutubeVideoId(video_info.watch_url);
+                const start = Math.floor(ID_IMAGE / start_time);
+                videoContent.src = `https://youtube.com/embed/${videoIdYoutube}?start=${start}`;
+            }
+        })
+        .catch(console.log);
+    }
+    const csrftoken = getCookie('csrftoken'); 
+
+    function formatOutput(data){
+        let scores = data.scores;
+        let idx_image = data.idx_image;
+        let frame_idxs = data.frame_idxs;
+        let img_paths = data.image_paths; 
+        let video_propose = data.video_propose;
+        let source_data = data.source;
+
+        // Update image grid
+        const imageGrid = document.querySelector('.image-grid');
+        imageGrid.innerHTML = '';
+        img_paths.forEach((image, index) => {
+            const imageBlock = document.createElement('div');
+            imageBlock.className = 'image-block';
+            imageBlock.style.width = '135px';
+            imageBlock.innerHTML = `
+                <div class="id-frame">${frame_idxs[index]}</div>
+                <img src="{{ MEDIA_URL }}${image}" alt="Image ${index + 1}" loading="lazy"> 
+                <div class="like-dislike-icon">
+                    <i class="fas fa-thumbs-up like" id="like-id" title="Like"></i>
+                    <i class="fas fa-thumbs-down dislike" id="dislike-id" title="Dislike"></i>
+                    ${source_data[index] === "extra" ? '<i class="fas fa-check icon-tick" title="Extra"></i>' : ''}
+                </div>
+                <div class="eye-slash-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+                        <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                        <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                        <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+                    </svg>
+                </div>
+                <div class="enlarge-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/>
+                    </svg>
+                </div>
+            `;
+            imageGrid.appendChild(imageBlock);
+        });
+        
+        // lưu video_info vào local storage
+        localStorage.setItem('video_info', JSON.stringify({"idx_image": idx_image,"frame_idxs": frame_idxs,"scores": scores,"source": source_data}));
+        console.log("Save ivideo_info to local storage");
+
+        // reset live_active và dislive_active là rỗng trong local storage
+        localStorage.setItem('live_active', JSON.stringify([]));
+        localStorage.setItem('dislive_active', JSON.stringify([]));
+        
+        // propose video
+        proposeGridContainer.innerHTML = '';
+        video_propose.forEach((videos) => {
+            const [videoName, list_score, list_idx_image, list_frame_idx, list_image_paths] = videos;
+
+            const proposeContainer = document.createElement('div');
+            proposeContainer.className = 'propose-container';
+            proposeContainer.innerHTML = `
+                <div class="propose-name">${videoName}</div>
+                <div class="propose-grid">
+                    ${list_image_paths.map((image, index) => `
+                        <div class="image-block">
+                            <div class="id-frame">${list_frame_idx[index]}</div>
+                            <img src="{{ MEDIA_URL }}${image}" alt="Image ${index + 1}" loading="lazy">
+                            <div class="like-dislike-icon">
+                                <i class="fas fa-thumbs-up like" id="like-id" title="Like"></i>
+                                <i class="fas fa-thumbs-down dislike" id="dislike-id" title="Dislike"></i>
+                                ${source_data[index] === "extra" ? '<i class="fas fa-check icon-tick" title="Extra"></i>' : ''}
+                            </div>
+                            <div class="eye-slash-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                                    <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+                                </svg>
+                            </div>
+                            <div class="enlarge-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/>
+                                </svg>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            proposeGridContainer.appendChild(proposeContainer);
+        });
+    }
+
+    function likeAndDislike(videoINFO){
+        const likeACTIVE = document.querySelectorAll('.like.active-icon');
+        const dislikeACTIVE = document.querySelectorAll('.dislike.active-icon');
+        
+        let live_active = [];
+        let live_active1 = [];
+        likeACTIVE.forEach(like => {
+            const imageBlockLike = like.closest('.image-block');
+            const idFrameLike = parseInt(imageBlockLike.querySelector('.id-frame').textContent);
+
+            const index = videoINFO["frame_idxs"].indexOf(idFrameLike); 
+            const idx_image = videoINFO["idx_image"][index];
+            live_active.push(idx_image);
+            live_active1.push(idFrameLike);
+        });
+
+
+        let dislive_active = [];
+        let dislive_active1 = [];
+        dislikeACTIVE.forEach(dislike => {
+            const imageBlockDislike = dislike.closest('.image-block');
+            const idFrameDislike = parseInt(imageBlockDislike.querySelector('.id-frame').textContent);
+
+            const index = videoINFO["frame_idxs"].indexOf(idFrameDislike); 
+            const idx_image = videoINFO["idx_image"][index];
+            dislive_active.push(idx_image);
+            dislive_active1.push(idFrameDislike);
+        });
+        
+        return [live_active, dislive_active, live_active1, dislive_active1];
+    }
+
+    function handleImageBlockClick(event){
+        const imageBlock = event.target.closest('.image-block');
+        if (event.target.closest('.enlarge-icon')) {
+            // Tìm tất cả các image-block và xóa lớp 'image-block-active'
+            const imageBlocks = document.querySelectorAll('.image-block');
+            imageBlocks.forEach(block => {
+                block.classList.remove('image-block-active');
+            });
+
+            // Thêm lớp 'image-block-active' cho khối được click
+            imageBlock.classList.add('image-block-active');
+            
+
+            // gửi id frame để lấy những frame gần nhất của video đó
+            const image_href = imageBlock.querySelector('img').src;
+            const videoId = image_href.split('/').slice(-2, -1)[0];
+            const index_frame = image_href.split('/').pop();
+            const is_extra = image_href.split('/'[-5]);
+            const ID_IMAGE = parseInt(imageBlock.querySelector('.id-frame').textContent);
+
+            fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE);
+        } else if(event.target.closest('.eye-slash-icon')) {
+            const videoINFO = JSON.parse(localStorage.getItem('video_info'));
+            const idFrame = parseInt(imageBlock.querySelector('.id-frame').textContent);
+
+            // tìm index của idFrame trong frame_idx
+            const index = videoINFO["frame_idxs"].indexOf(idFrame);
+            const frame_idx_new = videoINFO["frame_idxs"].filter((_, idx) => idx !== index);
+            const idx_image_new = videoINFO["idx_image"].filter((_, idx) => idx !== index);
+            const scores_new = videoINFO["scores"].filter((_, idx) => idx !== index);
+            const source_new = videoINFO["source"].filter((_, idx) => idx !== index);
+
+            // lưu video_info vào local storage
+            localStorage.setItem('video_info', JSON.stringify({"idx_image": idx_image_new,"frame_idxs": frame_idx_new,"scores": scores_new, "source": source_new}));
+            console.log("update idx_IMG and frame_idx to local storage");
+
+            imageBlock.remove();
+        } else if(event.target.closest('#like-id')){
+            const videoINFO = JSON.parse(localStorage.getItem('video_info'));
+            const likeID = event.target.closest('#like-id');
+            likeID.classList.add('active-icon');
+
+            const likeDislikeIcon = likeID.closest('.like-dislike-icon');
+            const dislikeID = likeDislikeIcon.querySelector('#dislike-id');
+            dislikeID.classList.remove('active-icon');
+
+            [live_active, dislive_active, live_active1, dislive_active1] = likeAndDislike(videoINFO);
+            localStorage.setItem('live_active', JSON.stringify(live_active));
+            localStorage.setItem('dislive_active', JSON.stringify(dislive_active));
+            localStorage.setItem('live_active1', JSON.stringify(live_active1));
+            localStorage.setItem('dislive_active1', JSON.stringify(dislive_active1));
+        } else if(event.target.closest('#dislike-id')){
+            const videoINFO = JSON.parse(localStorage.getItem('video_info'));
+            const dislikeID = event.target.closest('#dislike-id');
+            dislikeID.classList.add('active-icon');
+
+            const likeDislikeIcon = dislikeID.closest('.like-dislike-icon');
+            const likeID = likeDislikeIcon.querySelector('#like-id');
+            likeID.classList.remove('active-icon');
+
+            [live_active, dislive_active, live_active1, dislive_active1] = likeAndDislike(videoINFO);
+            localStorage.setItem('live_active', JSON.stringify(live_active));
+            localStorage.setItem('dislive_active', JSON.stringify(dislive_active));
+            localStorage.setItem('live_active1', JSON.stringify(live_active1));
+            localStorage.setItem('dislive_active1', JSON.stringify(dislive_active1));
+        }
+    }
+
+    // text query image 
+    const textSearch = document.querySelector('.text-search');
+    const numberSearch = document.querySelector('.number-search');
+    const btnTextSearch = document.querySelector('.btn-text-search');
+    const loader = document.querySelector('.loader');
+    const choiceQuery = document.querySelectorAll('.menu-choice');
+    const proposeGridContainer = document.querySelector('.propose-grid-container');
+    const reRankNextScene = document.querySelector(".re-rank")
+    const choiceExtra = document.querySelectorAll(".choice-extra")
+    const asr = document.querySelector('#asr');
+    const imageGrid = document.querySelector('.image-grid'); 
+    const options = document.querySelector('#options');
+
+    const choiceDict = {};
+    choiceQuery.forEach(choice => {
+        choiceDict[choice.id] = choice.checked ? 1 : 0;
+        choice.addEventListener('change', function() {
+            choiceDict[choice.id] = choice.checked ? 1 : 0;
+        }); 
+    });
+
+    const choiceExtraDict = {};
+    choiceExtra.forEach(choice => {
+        choiceExtraDict[choice.id] = choice.checked ? 1 : 0;
+        choice.addEventListener('change', function() {
+            choiceExtraDict[choice.id] = choice.checked ? 1 : 0;
+        }); 
+        
+    });
+
+    reRankNextScene.addEventListener('change', function() { 
+        if (reRankNextScene.checked) {
+            choiceExtra.forEach(choice => {
+                choice.disabled = true;
+            });
+            asr.disabled = true;
+        } else {
+            choiceExtra.forEach(choice => {
+                choice.disabled = false;
+            });
+            asr.disabled = false;
+        }
+    });
+    // reRankNextScene.addEventListener('change', function() { 
+    //     let reRankNextScene_value = reRankNextScene.checked ? 1 : 0;
+    // });
+
+    // set mặc định cho video_info nếu kiểm tra chưa tồn tại
+    if (!localStorage.getItem('video_info')) {
+        localStorage.setItem('video_info', JSON.stringify({"idx_image": [],"frame_idxs": [],"scores": [], "source": []}));
+    }
+    btnTextSearch.addEventListener('click', function() {
+        let reRankNextScene_value = reRankNextScene.checked ? 1 : 0;
+        const start = new Date().getTime();
+        if (textSearch.value) {
+            loader.style.display = 'block';
+            fetch('/api/text_search_image/', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                body: JSON.stringify({text: textSearch.value, number: numberSearch.value,
+                    choice_dict: choiceDict, reRankNextScene_value:reRankNextScene_value,
+                    idx_IMG:JSON.parse(localStorage.getItem('video_info'))["idx_image"],
+                    choiceExtraDict: choiceExtraDict,
+                    source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
+                    options: options.value
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const end = new Date().getTime();
+                console.log(`Time text search: ${end - start} ms`); 
+                
+                formatOutput(data);
+                
+                loader.style.display = 'none';
+            })
+            .catch(error => {
+                console.log(error);
+                loader.style.display = 'none';
+            });
+        } else {
+            alert('Please enter text to search');
+        }
+    });
+
+    // LLM
+    const btnLLM = document.querySelector('.llm');
+    btnLLM.addEventListener('click', function() {
+        if (textSearch.value) {
+            loader.style.display = 'block';
+            fetch('/api/llm/', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                body: JSON.stringify({
+                    query: textSearch.value, number: numberSearch.value
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {                
+                formatOutput(data);
+                
+                loader.style.display = 'none';
+            })
+            .catch(error => {
+                console.log(error);
+                loader.style.display = 'none';
+            });
+        } else {
+            alert('Please enter text to search');
+        }
+    });
+
+    // download query
+    const downloadQuery = document.querySelector('#download-query');
+    const nameQuery = document.querySelector('.name-query');  
+    const nameQA = document.querySelector('.name-QA');
+    downloadQuery.addEventListener('click', function() {
+        const imageBlock = imageGrid.querySelectorAll('.image-block');
+        const frameIdxs = Array.from(imageBlock).map(block => parseInt(block.querySelector('.id-frame').textContent));
+        const videoID = Array.from(imageBlock).map(block => block.querySelector('img').src.split('/').slice(-2, -1)[0]);
+
+        if (nameQuery.value) {
+            const convertToCSV = (frameIdxs, videoID) => {
+                const csvRows = [];
+                for (let i = 0; i < frameIdxs.length; i++) { 
+                    if (nameQA.value) {
+                        csvRows.push(`${videoID[i]},${frameIdxs[i]},${parseInt(nameQA.value)}`);
+                    } else {
+                        csvRows.push(`${videoID[i]},${frameIdxs[i]}`);
+                    }
+                }
+                return csvRows.join('\n');
+            };
+
+            const csvData = convertToCSV(frameIdxs, videoID);
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${nameQuery.value}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+
+        } else {
+            alert('Please enter name query');
+        }
+    });
+
+    // like and dislike (feelback)
+    const feelbackContainer = document.querySelector('.feelback-container');
+    feelbackContainer.addEventListener('click', function(event) {
+        const getLikeActive = JSON.parse(localStorage.getItem('live_active'));
+        const getDislikeActive = JSON.parse(localStorage.getItem('dislive_active'));
+        fetch('/api/feelback/', {
+            method: 'POST',
+            headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+            body: JSON.stringify({idx_image: JSON.parse(localStorage.getItem('video_info'))["idx_image"], 
+                                scores: JSON.parse(localStorage.getItem('video_info'))["scores"], 
+                                live_active: getLikeActive, dislive_active: getDislikeActive,
+                                choiceExtraDict: choiceExtraDict,
+                                source_query: JSON.parse(localStorage.getItem('video_info'))["source"]}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            formatOutput(data);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    });
+
+
+
+    // frame cluster
+    const navRight = document.getElementById('navRight');
+    const closeNavRight = navRight.querySelector('.close-nav-right');
+    closeNavRight.addEventListener('click', function() {
+        navRight.style.display = 'none';
+    });
+        
+    imageGrid.addEventListener('click', function(event) {
+        handleImageBlockClick(event);
+    });
+
+    // re-rank
+    const reRank = document.querySelector('.re-ranking');
+    reRank.addEventListener('click', function() {
+        const getLikeActive = JSON.parse(localStorage.getItem('live_active1'));
+        getLikeActive.reverse();
+        const imageBlock = imageGrid.querySelectorAll('.image-block');
+        const frameIdxs = Array.from(imageBlock).map(block => parseInt(block.querySelector('.id-frame').textContent));
+
+        const elementsToMove = [];
+
+        getLikeActive.forEach(idx_image => {
+            console.log(idx_image);
+            const index = frameIdxs.indexOf(parseInt(idx_image));
+            if (index !== -1) {
+                const imageBlock = imageGrid.querySelectorAll('.image-block')[index];
+                elementsToMove.push(imageBlock);
+            }
+        });
+
+        elementsToMove.forEach(element => {
+            imageGrid.insertBefore(element, imageGrid.firstChild);
+        });
+
+        // reset live_active và dislive_active
+        localStorage.setItem('live_active', JSON.stringify([]));
+        localStorage.setItem('dislive_active', JSON.stringify([]));
+        localStorage.setItem('live_active1', JSON.stringify([]));
+        localStorage.setItem('dislive_active1', JSON.stringify([]));
+
+        // removes active-icon class
+        const likeACTIVE = document.querySelectorAll('.like.active-icon');
+        const dislikeACTIVE = document.querySelectorAll('.dislike.active-icon');
+        likeACTIVE.forEach(like => {
+            like.classList.remove('active-icon');
+        });
+        dislikeACTIVE.forEach(dislike => {
+            dislike.classList.remove('active-icon');
+        });
+    });
+
+    // frame propose cluster
+    proposeGridContainer.addEventListener('click', function(event) {
+        handleImageBlockClick(event);
+    });
+
+    //  Image upload
+    $(document).ready(function() {
+        // Toggle dropdown visibility when the button is clicked
+        $('.btn-image-search').on('click', function() {
+            $('.dropdown-menu').toggle();
+        });
+
+        // Close dropdown if clicking outside
+        $(document).on('click', function(event) {
+            if (!$(event.target).closest('.btn-image-search, .dropdown-menu').length) {
+                $('.dropdown-menu').hide();
+            }
+        });
+
+        // Trigger file input when clicking on dropzone
+        $('.dropzone').on('click', function(event) {
+            if (!$(event.target).is('#image-file-search') && !$(event.target).closest('#image-file-search').length) {
+                $('#image-file-search').click();
+            }
+        });
+
+        // Handle file selection through input
+        $('#image-file-search').on('change', function(event) {
+            handleFiles(event.target.files);
+        });
+
+        // Handle drag and drop
+        $('#dropzone').on('dragover', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).addClass('dragging');
+        });
+
+        $('#dropzone').on('dragleave', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).removeClass('dragging');
+        });
+
+        $('#dropzone').on('drop', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).removeClass('dragging');
+            handleFiles(event.originalEvent.dataTransfer.files);
+        });
+
+        // Handle paste event when focusing on the paste-image input
+        $('#paste-image').on('paste', function(event) {
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (var index in items) {
+                var item = items[index];
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    var file = item.getAsFile();
+                    updateInputAndPreview(file);
+                    break;
+                }
+            }
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                var file = files[0];
+                updateInputAndPreview(file);
+            }
+        }
+
+        function updateInputAndPreview(file) {
+            if (file.type.startsWith('image/')) {
+                $('#image-file-search')[0].value = ''; 
+
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                $('#image-file-search')[0].files = dataTransfer.files;
+
+                sendFileToAPI(file);
+
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    $('#preview-image').attr('src', event.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select an image file.');
+            }
+        }
+
+        function sendFileToAPI(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const numberSearch = $('.number-search').val();
+            const nextSceneImageQuery = $('#next-scene-image-query');
+            var nextSceneImage_value = nextSceneImageQuery.checked ? 1:0;
+            formData.append('numberSearch', numberSearch);
+            formData.append('id_Img', JSON.parse(localStorage.getItem('video_info'))["idx_image"]);
+            formData.append('nextScene', nextSceneImage_value);
+            formData.append('choiceExtraDict', JSON.stringify(choiceExtraDict));
+            formData.append('options', options.value);
+
+            fetch('/api/image_query/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => { 
+                formatOutput(data);
+            })
+            .catch(error => {
+                console.log(error); 
+            });
+        }
+    });
+
+    // image search cluster 
+    const imageSearchCluster = document.querySelector('.right-image-search');
+    imageSearchCluster.addEventListener('click', function() {
+        const frame_path = navRight.querySelector('.right-image img').src;
+        const name_frame = frame_path.split('/').pop();
+        const id_video = navRight.querySelector('.right-id-video').textContent;
+ 
+        fetch('/api/image_search_cluster/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ name_frame, id_video,
+                choiceExtraDict: choiceExtraDict
+             }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                let idx_frame = data.idx_frame;
+                let image_paths = data.image_paths;
+                let source_data = data.source;
+
+                // image_paths = image_paths.map(image_path => image_path.replace('D:/HocTap/CuocThi/AIC2024/media/', 'DataSampleAIC23/'));
+                const navRight = document.querySelector('.nav-right');
+                const rightRecommend = navRight.querySelector('.right-recommend');
+                rightRecommend.innerHTML = '';
+                if (image_paths && image_paths.length > 0) {
+                    image_paths.forEach((image_path,index) => {
+                    const imageBlock = document.createElement('div');
+                    imageBlock.className = 'right-image-block';
+                    imageBlock.innerHTML = `
+                        <div class="right-image-id">${idx_frame[index]}</div>
+                        <img src="{{ MEDIA_URL }}${image_path}" alt="Image ${index}" loading="lazy">
+                        <div class="eye-slash-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+                                <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+                                <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+                                <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+                            </svg>
+                        </div>
+                        <div class="tick-icon">
+                            ${source_data[index] === "extra" ? '<i class="fas fa-check icon-tick" title="Extra"></i>' : ''}
+                        </div>
+                        <div class="right-enlarge-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707m4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707m0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707m-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707"/>
+                            </svg>
+                        </div>
+                    `;
+                    rightRecommend.appendChild(imageBlock);
+                });
+                } else {
+                    console.error('image_paths is undefined or empty');
+                }
+                
+            }
+        })
+        .catch(console.log);
+    });
+    
+    // zoom in
+    const rightZoomIn = document.querySelector('.right-zoom-in');
+    rightZoomIn.addEventListener('click', function() { 
+        const rightImageBlock = rightZoomIn.closest('.right-image-child');
+        const frameURL = rightImageBlock.querySelector('img').src;
+        window.open(frameURL, '_blank');
+    });
+
+    // open clusterframes from image search cluster
+    const rightRecommend = document.querySelector('.right-recommend');
+    rightRecommend.addEventListener('click', function(event) {
+        if (event.target.closest('.right-enlarge-icon')) {
+            const rightImageBlocks = document.querySelectorAll('.right-image-block');
+            rightImageBlocks.forEach(block => {
+                block.classList.remove('right-image-block-active');
+            });
+
+            const rightImageBlock = event.target.closest('.right-image-block');
+            rightImageBlock.classList.add('right-image-block-active');
+            
+            const idFrame = rightImageBlock.querySelector('.right-image-id').textContent;
+            const image_href = rightImageBlock.querySelector('img').src;
+            const videoId = image_href.split('/').slice(-2, -1)[0];
+            const index_frame = image_href.split('/').pop();
+            const is_extra = image_href.split('/'[-5]);
+            const ID_IMAGE = parseInt(imageBlock.querySelector('.id-frame').textContent);
+
+            fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE);
+        }else if(event.target.closest('.eye-slash-icon')) {
+            const rightImageBlock = event.target.closest('.right-image-block');
+            rightImageBlock.remove();
+        }
+    });
+
+    // filter
+    // Khởi tạo Fabric canvas
+    var canvas = new fabric.Canvas('canvas0', {
+        backgroundColor: 'white',
+        isDrawingMode: false
+    });
+
+    // Hàm vẽ lưới
+    function drawGrid() {
+        var canvasWidth = canvas.width;
+        var canvasHeight = canvas.height;
+        var numLines = 6;
+        var spacingX = canvasWidth / (numLines + 1);
+        var spacingY = canvasHeight / (numLines + 1);
+
+        // Vẽ các đường thẳng dọc và ngang với nét đứt
+        for (var i = 1; i <= numLines; i++) {
+            var x = i * spacingX;
+            var y = i * spacingY;
+            canvas.add(new fabric.Line([x, 0, x, canvasHeight], { stroke: '#ababab', strokeWidth: 1, selectable: false, strokeDashArray: [5, 5] }));
+            canvas.add(new fabric.Line([0, y, canvasWidth, y], { stroke: '#ababab', strokeWidth: 1, selectable: false, strokeDashArray: [5, 5] }));
+        }
+        canvas.renderAll();
+    }
+
+    function getObjectGridPositions(obj) {
+        var canvasWidth = canvas.width;
+        var canvasHeight = canvas.height;
+        var numLines = 6; 
+        var spacingX = canvasWidth / (numLines + 1);
+        var spacingY = canvasHeight / (numLines + 1);
+        var gridPositions = [];
+
+        var name = obj.name || 'unknown';
+
+        var left = obj.left;
+        var top = obj.top;
+        var width = obj.width * obj.scaleX;
+        var height = obj.height * obj.scaleY;
+
+        var xStart = Math.max(0, Math.floor(left / spacingX));
+        var xEnd = Math.min(numLines, Math.floor((left + width) / spacingX));
+        var yStart = Math.max(0, Math.floor(top / spacingY));
+        var yEnd = Math.min(numLines, Math.floor((top + height) / spacingY));
+
+        var letters = 'abcdefg';
+
+        for (var x = xStart; x <= xEnd; x++) {
+            for (var y = yStart; y <= yEnd; y++) {
+                gridPositions.push(letters[y] + x + name);
+            }
+        }
+
+        return gridPositions;
+    }
+
+    function logAllObjectsInCanvas() {
+        var objectsAll = canvas.getObjects().filter(obj => obj.isIcon === true  || obj.isTag === true);
+        var objectNames = [];
+        var bbox = [];
+        var color = [];
+        var tag = [];
+        // lấy colorNames từ local storage
+        var colorNames = JSON.parse(localStorage.getItem('colorNames'));
+        colorNames = colorNames.map(color => color.toLowerCase());
+
+        objectsAll.forEach(obj => {
+            var positions = getObjectGridPositions(obj).join(' ');
+            if (colorNames.includes(obj.name.toLowerCase())) {
+                objectNames.push(obj.name);
+                color.push(positions);
+            }
+            else if (obj.isTag) {
+                objectNames.push(obj.name);
+                tag.push(positions);
+            }
+            else if (obj.isIcon) { 
+                objectNames.push(obj.name);
+                bbox.push(positions);
+            }
+        });
+        
+        // get number bbox
+        var numberBbox = document.querySelector('.number-search-bbox');
+        var numberTag = document.querySelector('.number-search-tag');
+        var filter_dict = {
+            query: {
+                // objects: objectNames.join(' '),
+                // bbox: bbox.join(' '),
+                number: numberBbox.value.trim(),
+                // color: color.join(' '),
+                // tag_bbox: tag.join(' '),
+                synthetic: bbox.join(' ') + ' . ' + color.join(' . ') + ' ' + tag.join(' . '),
+                number_tag: numberTag.value.trim()
+            }
+        };
+        console.log(JSON.stringify(filter_dict));
+
+        const nextSceneObjects = document.querySelector(".next-scene-objects");
+        var next_objects = nextSceneObjects.checked ? 1:0;
+        fetch('/api/filter_search/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ filter_dict,numberSearch: numberSearch.value,
+                next_objects:next_objects, id_img_objects:JSON.parse(localStorage.getItem('video_info'))["idx_image"],
+                choiceExtraDict: choiceExtraDict,
+                source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
+                options: options.value
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else { 
+                formatOutput(data);
+            }
+            
+        })
+        .catch(console.log);
+    }
+
+
+
+    // Hàm xử lý kéo và thả
+    function setupDragAndDrop() {
+        document.querySelector('.canvas-container').addEventListener('dragover', e => e.preventDefault());
+        document.querySelector('.canvas-container').addEventListener('drop', e => {
+            e.preventDefault();
+            var imgSrc = e.dataTransfer.getData('text');
+            var canvasRect = canvas.getElement().getBoundingClientRect();
+            var x = e.clientX - canvasRect.left;
+            var y = e.clientY - canvasRect.top;
+
+            fabric.Image.fromURL(imgSrc, img => {
+                var name = imgSrc.split('/').pop().split('.')[0];
+
+                img.set({ left: x, top: y, scaleX: 50 / img.width, scaleY: 50 / img.height, selectable: true, isIcon: true, name: name });
+                canvas.add(img);
+                canvas.setActiveObject(img);
+                canvas.renderAll();
+                logAllObjectsInCanvas();  
+            }, { crossOrigin: 'anonymous' });
+        });
+
+        document.querySelector('.tag-search-bboxes').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.target.value !== '') {
+                e.preventDefault();
+                var inputValue = e.target.value;
+        
+                // Create a new rectangle
+                var rect = new fabric.Rect({
+                    left: 20,
+                    top: 20,
+                    fill: null,  
+                    stroke: 'black',
+                    strokeWidth: 2,
+                    width: 50,
+                    height: 50,
+                    selectable: true
+                });
+        
+                // Create a text object with the input value
+                var text = new fabric.Text(inputValue, {
+                    fontSize: 14,
+                    originX: 'center',
+                    originY: 'center',
+                    left: rect.left + rect.width / 2,
+                    top: rect.top + rect.height / 2,
+                    selectable: false  
+                });
+        
+                var group = new fabric.Group([rect, text], {
+                    left: 20,
+                    top: 20,
+                    selectable: true
+                });
+                
+                group.set({ isTag: true });
+        
+                group.name = inputValue;
+        
+                // Add the group to the canvas
+                canvas.add(group);
+                canvas.setActiveObject(group);
+                canvas.renderAll();
+        
+                // Clear the input field
+                e.target.value = '';
+        
+                logAllObjectsInCanvas();  
+            }
+        });
+        
+        canvas.on('object:modified', e => {
+            var obj = e.target;
+            if (obj.isIcon || obj.isTag) {
+                logAllObjectsInCanvas();  
+            }
+        });
+
+    }
+
+    // Hàm xóa đối tượng được chọn
+    function deleteSelectedObjects() {
+        var activeObjects = canvas.getActiveObjects();
+        if (activeObjects.length > 0) {
+            activeObjects.forEach(obj => canvas.remove(obj));
+            canvas.discardActiveObject();
+        } else {
+            var activeObject = canvas.getActiveObject();
+            if (activeObject) {
+                canvas.remove(activeObject);
+            }
+        }
+        canvas.renderAll();
+        logAllObjectsInCanvas();
+    }
+
+    // Hàm chọn tất cả các đối tượng icon
+    function selectAllIcons() {
+        canvas.discardActiveObject();
+        var iconObjects = canvas.getObjects().filter(obj => obj.type === 'image' || obj.isIcon === true  || obj.isTag === true);
+        if (iconObjects.length > 0) {
+            var selection = new fabric.ActiveSelection(iconObjects, { canvas: canvas });
+            canvas.setActiveObject(selection);
+            canvas.renderAll();
+        }
+    }
+
+    // Hàm sao chép các đối tượng đã chọn
+    function copySelectedObjects() {
+        var activeObjects = canvas.getActiveObjects();
+        if (activeObjects.length > 0) {
+            canvas.discardActiveObject();
+            clipboard = activeObjects.map(obj => fabric.util.object.clone(obj));
+        }
+    }
+
+    // Hàm dán các đối tượng đã sao chép
+    function pasteCopiedObjects() {
+        if (clipboard) {
+            clipboard.forEach(clonedObj => {
+                clonedObj.set({ left: clonedObj.left + 10, top: clonedObj.top + 10, evented: true });
+                canvas.add(clonedObj);
+            });
+            canvas.renderAll();
+            clipboard = clipboard.map(obj => fabric.util.object.clone(obj));
+            logAllObjectsInCanvas();
+        }
+    }
+
+    // Thêm các sự kiện phím
+    function setupKeyboardEvents() {
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                selectAllIcons();
+            } else if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                copySelectedObjects();
+            } else if (e.ctrlKey && e.key === 'v') {
+                e.preventDefault();
+                pasteCopiedObjects();
+            } else if (e.key === 'Delete') {
+                deleteSelectedObjects();
+            }
+        });
+    }
+
+    // Xử lý sự kiện khi click vào nút xóa
+    document.querySelector('.canvasCleanItem').addEventListener('click', function() {
+        deleteSelectedObjects();
+    });
+    
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const input_textarea = document.querySelectorAll('input, textarea');
+        input_textarea.forEach(input => {
+            input.addEventListener('focus', (event) => {
+                const target = event.target;
+
+                target.addEventListener('keydown', (event) => {
+                    if (event.ctrlKey) {
+                        if (event.key === 'c' || event.key === 'v' || event.key === 'a') {
+                            event.stopImmediatePropagation(); 
+                        }
+                    }
+                });
+
+                target.addEventListener('paste', (event) => {
+                    event.stopImmediatePropagation(); 
+                });
+
+                target.addEventListener('copy', (event) => {
+                    event.stopImmediatePropagation(); 
+                });
+            });
+        });
+    });
+
+
+    function initialize() {
+        drawGrid();
+        setupDragAndDrop();
+        setupKeyboardEvents();
+    }
+
+    initialize();
+
+    // tag search
+    const tagBox = document.querySelector('.tag-box');
+    const tagSelectBox = document.querySelector('.tag-select-box');
+    const deleteTagChoice = document.querySelector('.delete-tag-choice');
+    const tagSearchInput = document.querySelector('.tag-search');
+
+    function updateTags() {
+        return tagBox.querySelectorAll('.tag');
+    }
+
+    function fetchTagsSearch(tags, number, nextSceneTag,options) {
+        const nextScene = nextSceneTag.checked ? 1:0;
+        fetch('/api/tag_query/', {
+                method: 'POST',
+                headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                body: JSON.stringify({ tag_query:tags, numberSearch:number, nextScene:nextScene,
+                    id_Img: JSON.parse(localStorage.getItem('video_info'))["idx_image"],
+                    choiceExtraDict: choiceExtraDict,
+                    source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
+                    options: options.value
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                formatOutput(data);
+            })
+            .catch(console.log);
+    }
+
+    tagBox.addEventListener('click', function(event) {
+        if (event.target.classList.contains('tag')) {
+            const tag = event.target;
+            tagBox.removeChild(tag);
+            tag.classList.remove('tag');
+            tag.classList.add('tag-select');
+            tagSelectBox.appendChild(tag);
+
+            const tags = tagSelectBox.querySelectorAll('.tag-select');
+            const tagNames = Array.from(tags).map(tag => tag.textContent);
+            const nextSceneTag = document.querySelector(".next-scene-tag");
+            fetchTagsSearch(tagNames.join(' '), numberSearch.value, nextSceneTag, options);
+        }
+    });
+
+    tagSelectBox.addEventListener('click', function(event) {
+        if (event.target.classList.contains('tag-select')) {
+            const tag = event.target;
+            tagSelectBox.removeChild(tag);
+            tag.classList.remove('tag-select');
+            tag.classList.add('tag');
+            tagBox.appendChild(tag);
+
+            const tags = tagSelectBox.querySelectorAll('.tag-select');
+            const tagNames = Array.from(tags).map(tag => tag.textContent);
+            const nextSceneTag = document.querySelector(".next-scene-tag");
+            fetchTagsSearch(tagNames.join(' '), numberSearch.value, nextSceneTag);
+        }
+    });
+
+    deleteTagChoice.addEventListener('click', function() {
+        const tags = tagSelectBox.querySelectorAll('.tag-select');
+        tags.forEach(tag => {
+            tagSelectBox.removeChild(tag);
+            tag.classList.remove('tag-select');
+            tag.classList.add('tag');
+            tagBox.appendChild(tag);
+        });
+    });
+
+    tagSearchInput.addEventListener('input', function() {
+        const searchText = tagSearchInput.value.toLowerCase();
+        const tags = updateTags();
+
+        tags.forEach(tag => {
+            const tagText = tag.textContent.toLowerCase();
+            if (tagText.includes(searchText)) {
+                tag.style.display = 'inline-block';
+            } else {
+                tag.style.display = 'none';
+            }
+        });
+    }); 
+    
+    // LLM chatbot
+    const chatbotToggler = document.querySelector(".chatbot-toggler");
+    const closeBtn = document.querySelector(".close-btn");
+    const chatbox = document.querySelector(".chatbox");
+    const chatInput = document.querySelector(".chat-input textarea");
+    const sendChatBtn = document.querySelector(".chat-input span");
+
+    let userMessage = null; // Variable to store user's message
+    const inputInitHeight = chatInput.scrollHeight;
+
+    const createChatLi = (message, className) => {
+    // Create a chat <li> element with passed message and className
+    const chatLi = document.createElement("li");
+    chatLi.classList.add("chat", `${className}`);
+    let chatContent = className === "outgoing" ? `<p></p>` : 
+        `<span class="material-symbols-outlined">smart_toy</span>
+        <div class="bot-reply">
+            <p></p>
+            <div class="chatbot-image-grid">
+            </div>
+        </div>`;
+    chatLi.innerHTML = chatContent;
+    chatLi.querySelector("p").textContent = message;
+    return chatLi; // return chat <li> element
+    }
+
+    const generateResponse = async (chatElement) => {
+        const messageElement = chatElement.querySelector("p");
+
+        // Send POST request to API, get response and set the reponse as paragraph text
+        try {
+            fetch('/api/llm_chatbot/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ message: userMessage }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle success response
+                let reply = data.reply;
+                let frame_idxs1 = data.frame_idxs;
+                let image_paths1 = data.image_paths;
+                messageElement.textContent = reply.replace(/\*\*(.*?)\*\*/g, '$1');;
+
+                if (frame_idxs1 && frame_idxs1.length > 0) {
+                    const chatbotImageGrid = chatElement.querySelector(".chatbot-image-grid");
+                    chatbotImageGrid.innerHTML = "";
+                    frame_idxs1.forEach((frame_idx, index) => {
+                        const chatbotImageBlock = document.createElement("div");
+                        chatbotImageBlock.className = "chatbot-image-block";
+                        chatbotImageBlock.innerHTML = `
+                            <div class="chatbot-id-frame">${frame_idx}</div>
+                            <img src="{{ MEDIA_URL }}${image_paths1[index]}" alt="Image ${index}">
+                        `;
+                        chatbotImageGrid.appendChild(chatbotImageBlock);
+                    });
+                }
+            })
+            .catch(error => {
+                // Handle error response
+                messageElement.classList.add("error");
+                messageElement.textContent = "Xin lỗi, tôi không thể trả lời câu hỏi này.";
+                console.error("Fetch error: ", error);
+            });
+
+        // } catch (error) {
+        //     // Handle error
+        //     messageElement.classList.add("error");
+        //     messageElement.textContent = error.message;
+        } finally {
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
+    }
+
+    const handleChat = () => {
+    userMessage = chatInput.value.trim(); // Get user entered message and remove extra whitespace
+    if (!userMessage) return;
+
+    // Clear the input textarea and set its height to default
+    chatInput.value = "";
+    chatInput.style.height = `${inputInitHeight/5}px`;
+
+    // Append the user's message to the chatbox
+    chatbox.appendChild(createChatLi(userMessage, "outgoing"));
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+
+    setTimeout(() => {
+        // Display "Thinking..." message while waiting for the response
+        const incomingChatLi = createChatLi("Thinking...", "incoming");
+        chatbox.appendChild(incomingChatLi);
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+        generateResponse(incomingChatLi);
+    }, 600);
+    }
+
+    chatInput.addEventListener("input", () => {
+    // Adjust the height of the input textarea based on its content
+    chatInput.style.height = `${inputInitHeight}px`;
+    chatInput.style.height = `${chatInput.scrollHeight}px`;
+    });
+
+    chatInput.addEventListener("keydown", (e) => {
+    // If Enter key is pressed without Shift key and the window 
+    // width is greater than 200px, handle the chat
+    if (e.key === "Enter" && !e.shiftKey && window.innerWidth > 10) {
+        e.preventDefault();
+        handleChat();
+    }
+    });
+
+    sendChatBtn.addEventListener("click", handleChat);
+    closeBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+    chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+    </script>
+</body>
+</html>

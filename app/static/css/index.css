@@ -1,0 +1,84 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+header {
+    width: 100%;
+    height: 60px; 
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+    box-sizing: border-box; 
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+.nav-left {
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+    border-right: 1px solid #ddd;
+}
+
+main {
+    width: 45%;
+    padding: 10px;
+    flex: 1;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.nav-right {
+    position: relative;
+    width: 35%;  
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-left: 1px solid #ddd; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: repeating-conic-gradient(#000 0 90deg, #ccc 0 180deg);
+    animation: l21 1s infinite linear;
+
+    /* Đoạn mã để căn giữa và đặt ở phía trên cùng */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1000;
+}
+
+@keyframes l21 {
+    100% {
+        transform: rotate(.5turn);
+    }
+}
+
+
+/* cluster-frames */
+.cluster-frames { 
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.cluster-frame-process {
+    flex-grow: 1;
+    width: calc(100% - 150px);
+}
+
