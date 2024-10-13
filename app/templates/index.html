@@ -425,9 +425,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="{% static 'js/others.js' %}"></script>
-    <script src="{% static 'js/loadObject.js' %}"></script>
     <script src="{% static 'js/jquery_colect.js' %}"></script>
     <script> 
+    const API_URL = "";
     // cookie
     function getCookie(name) {
         let cookieValue = null;
@@ -451,7 +451,7 @@
     }
 
     function fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE) {
-        fetch('/api/cluster_frames/', {
+        fetch(`${API_URL}/api/cluster_frames/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -756,7 +756,7 @@
         const start = new Date().getTime();
         if (textSearch.value) {
             loader.style.display = 'block';
-            fetch('/api/text_search_image/', {
+            fetch(`${API_URL}/api/text_search_image/`, {
                 method: 'POST',
                 headers: {
                         'Content-Type': 'application/json',
@@ -793,7 +793,7 @@
     btnLLM.addEventListener('click', function() {
         if (textSearch.value) {
             loader.style.display = 'block';
-            fetch('/api/llm/', {
+            fetch(`${API_URL}/api/llm/`, {
                 method: 'POST',
                 headers: {
                         'Content-Type': 'application/json',
@@ -860,7 +860,7 @@
     feelbackContainer.addEventListener('click', function(event) {
         const getLikeActive = JSON.parse(localStorage.getItem('live_active'));
         const getDislikeActive = JSON.parse(localStorage.getItem('dislive_active'));
-        fetch('/api/feelback/', {
+        fetch(`${API_URL}/api/feelback/`, {
             method: 'POST',
             headers: {
                     'Content-Type': 'application/json',
@@ -1038,7 +1038,7 @@
             formData.append('choiceExtraDict', JSON.stringify(choiceExtraDict));
             formData.append('options', options.value);
 
-            fetch('/api/image_query/', {
+            fetch(`${API_URL}/api/image_query/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken
@@ -1062,7 +1062,7 @@
         const name_frame = frame_path.split('/').pop();
         const id_video = navRight.querySelector('.right-id-video').textContent;
  
-        fetch('/api/image_search_cluster/', {
+        fetch(`${API_URL}/api/image_search_cluster/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1253,7 +1253,7 @@
 
         const nextSceneObjects = document.querySelector(".next-scene-objects");
         var next_objects = nextSceneObjects.checked ? 1:0;
-        fetch('/api/filter_search/', {
+        fetch(`${API_URL}/api/filter_search/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1478,7 +1478,7 @@
 
     function fetchTagsSearch(tags, number, nextSceneTag,options) {
         const nextScene = nextSceneTag.checked ? 1:0;
-        fetch('/api/tag_query/', {
+        fetch(`${API_URL}/api/tag_query/`, {
                 method: 'POST',
                 headers: {
                         'Content-Type': 'application/json',
@@ -1583,7 +1583,7 @@
 
         // Send POST request to API, get response and set the reponse as paragraph text
         try {
-            fetch('/api/llm_chatbot/', {
+            fetch(`${API_URL}/api/llm_chatbot/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1668,6 +1668,107 @@
     sendChatBtn.addEventListener("click", handleChat);
     closeBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
     chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+
+    // -----------------------------------------------------------------------------------
+    // Load icons and colors
+    fetch(`${API_URL}/api/objects/`, {
+        method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            console.log(data); 
+            image_objects = data.image_objects;
+
+            const container = document.querySelector('.icon-container');
+            image_objects.forEach(icon => {
+                const iconBox = document.createElement('div');
+                iconBox.className = 'icon-box';
+                iconBox.dataset.imgSrc = icon.src;
+        
+                const img = document.createElement('img');
+                img.src = icon.src;
+                img.title = icon.name;
+                img.id = icon.name.toLowerCase(); 
+        
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'name-icon';
+                nameDiv.textContent = icon.name;
+        
+                iconBox.appendChild(img);
+                iconBox.appendChild(nameDiv);
+        
+                container.appendChild(iconBox);
+            });
+        }
+    })
+    .catch(console.log);
+
+    fetch(`${API_URL}/api/colors/`, {
+        method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            console.log(data); 
+            image_objects = data.image_objects;
+
+            const container = document.querySelector('.color-container');
+            image_objects.forEach(color => {
+                const colorBox = document.createElement('div');
+                colorBox.className = 'color-box';
+                colorBox.dataset.imgSrc = color.src;
+        
+                const img = document.createElement('img');
+                img.src = color.src;
+                img.title = color.name;
+                img.id = color.name.toLowerCase();  
+        
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'name-color';
+                nameDiv.textContent = color.name;
+        
+                colorBox.appendChild(img);
+                colorBox.appendChild(nameDiv);
+        
+                container.appendChild(colorBox);
+            });
+            var colorNames = [];
+            image_objects.forEach(color => {
+                colorNames.push(color.name);
+            });
+            localStorage.setItem('colorNames', JSON.stringify(colorNames));
+        }
+    })
+    .catch(console.log);
+
+    // load tag
+    fetch(`${API_URL}/api/tag_query/`, {
+        method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            console.log(data); 
+            let tags = data.tags;
+
+            const tagBox = document.querySelector('.tag-container .tag-box');
+            tags.forEach(tag => {
+                const tagDiv = document.createElement('div');
+                tagDiv.className = 'tag';
+                tagDiv.textContent = tag;
+                tagDiv.dataset.tag = tag;
+                tagBox.appendChild(tagDiv);
+            });
+        }
+    })
+    .catch(console.log);
     </script>
 </body>
 </html>
