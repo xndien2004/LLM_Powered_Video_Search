@@ -18,8 +18,8 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 # features preparing
 tag_corpus_path = MEDIA_ROOT + '/tag/tag_corpus.txt'
 dict_path = {
-    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss_openclip.bin',
-    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss_EVACLIP.bin',
+    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_openclip.bin',
+    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_EVACLIP.bin',
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps.json',
     'map_asr_json_path': MEDIA_ROOT + '/map-asr.json',
     'dict_pkl_object_path': {
@@ -43,8 +43,8 @@ dict_path = {
 }
 
 dict_path_extra = {
-    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss_openclip_extra.bin',
-    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss_EVAclip_extra.bin',
+    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_openclip_extra.bin',
+    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_EVAclip_extra.bin',
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps_extra.json',
     'map_asr_json_path': MEDIA_ROOT + '/map-asr.json',
     'dict_pkl_object_path': {
@@ -66,6 +66,8 @@ dict_path_extra = {
     'dict_pkl_tag_path': '/pkl_extra/tfidf_transform_tag.pkl',
     'dict_npz_tag_path': '/npz_extra/sparse_context_matrix_tag.npz'
 }
+key_api = "D:/Wordspace/Python/paper_competition/key_gpt.txt"
+keyword = "./keyword.txt"
 
 # load file
 is_extra = "no"
@@ -81,8 +83,6 @@ else:
     cosine_faiss_extra = faiss_search.FaissSearch(dict_path_extra, is_openclip, is_object, is_evalip)
 
 # LLM
-key_api = "D:/Wordspace/Python/paper_competition/key_gpt.txt"
-keyword = "./keyword.txt"
 llm_auto = llm_retrieval.QueryProcessor(api_key_path=key_api)
 
 # API 

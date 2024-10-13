@@ -473,9 +473,6 @@
                 clusterFrameProcess.max = n-1;
                 clusterFrameProcess.min = 0;
                 clusterFrameProcess.value = ID_frame;
-
-                // const dict = Array.from({ length: n }, (_, i) => i).map(i => i + 1).reduce((acc, i, idx) => ({ ...acc, [i]: cluster_frames_path[idx] }), {});
-
                 const updateImageAndTitle = value => {
                     const imageBlock = navRight.querySelector('.right-image img');
                     imageBlock.src = `{{ MEDIA_URL }}${cluster_frames_path[value]}`;
