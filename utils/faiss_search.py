@@ -3,8 +3,6 @@ import torch
 import clip
 import faiss
 import numpy as np
-import pandas as pd
-import sys
 import os
 from PIL import Image
 import gc
@@ -16,6 +14,7 @@ from .caption_retrieval.caption_retrieval import caption_retrieval
 from .ocr_retrieval.ocr_retrieval import ocr_retrieval
 from .asr_retrieval.asr_retrieval import asr_retrieval
 from .tag_retrieval.tag_retrieval import tag_retrieval
+from .combine_search import maximal_marginal_relevance
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -34,12 +33,12 @@ class FaissSearch:
             self.object_retrieval = object_retrieval(self.id2img_fps, dict_path['dict_pkl_object_path'], dict_path['dict_npz_object_path'])
         if is_openclip:
             self.index_open_clip = self.load_bin_file(dict_path['faiss_openclip_bin_path'])
-            self.open_clip_model, _, self.openclip_preprocess = open_clip.create_model_and_transforms('ViT-L-14', device=self.__device, pretrained='datacomp_xl_s13b_b90k')
-            self.open_clip_tokenizer = open_clip.get_tokenizer('ViT-L-14')
+            self.open_clip_model, _, self.openclip_preprocess = open_clip.create_model_and_transforms('ViT-SO400M-14-SigLIP-384', device=self.__device, pretrained='webli')
+            self.open_clip_tokenizer = open_clip.get_tokenizer('ViT-SO400M-14-SigLIP-384')
         if is_evalip:
             self.index_evalip = self.load_bin_file(dict_path['faiss_evalip_bin_path'])
-            self.evalip_model, _, self.evalip_preprocess = open_clip.create_model_and_transforms('EVA02-L-14-336', device=self.__device, pretrained='merged2b_s6b_b61k')
-            self.evalip_tokenizer = open_clip.get_tokenizer('EVA02-L-14-336')
+            self.evalip_model, _, self.evalip_preprocess = open_clip.create_model_and_transforms('ViT-H-14-378-quickgelu', device=self.__device, pretrained='dfn5b')
+            self.evalip_tokenizer = open_clip.get_tokenizer('ViT-H-14-378-quickgelu')
 
 
     def load_json_file(self, json_path: str): 
@@ -58,17 +57,17 @@ class FaissSearch:
     def get_frame_info(self, idx_image):
         infos_query = list(map(self.id2img_fps.get, list(idx_image)))
         image_paths = [info['image_path'] for info in infos_query]
-        frame_idx = [info['frame_idx'] for info in infos_query]
+        frame_idx = [info['pts_time'] for info in infos_query]
         return frame_idx, image_paths
     
     def get_frame_info_single(self, idx_image):
         info_query = self.id2img_fps.get(idx_image)
         image_path = info_query['image_path']
-        frame_idx = info_query['frame_idx']
+        frame_idx = info_query['pts_time']
         return frame_idx, image_path
 
     
-    def text_search_openclip(self, text: str, index=None, k=5, is_translate=True):
+    def text_search_openclip(self, text: str, index=None, is_mmr=False, lambda_param=0.5, k=5, is_translate=True):
         # translate
         if is_translate:
             text = str(translate_lib(text, to_lang='en'))
@@ -82,6 +81,7 @@ class FaissSearch:
 
         ###### SEARCHING #####
         index_choosed = self.index_open_clip
+        k = k*2 if is_mmr else k
 
         if index is None:
             scores, idx_image = index_choosed.search(text_features, k=k)
@@ -90,12 +90,20 @@ class FaissSearch:
             scores, idx_image = index_choosed.search(text_features, k=k, 
                                                      params=faiss.SearchParametersIVF(sel=id_selector))
         idx_image = idx_image.flatten() 
+        scores = scores.flatten()
 
+        if is_mmr:
+            print("use MMR")
+            doc_embeddings = [self.index_open_clip.reconstruct(int(idx)) for idx in idx_image]
+            selected_indices = maximal_marginal_relevance(text_features[0], doc_embeddings, lambda_param=lambda_param, top_k=k)
+            idx_image = np.array(idx_image)[selected_indices]
+            scores = scores[selected_indices]
         ###### GET INFOS KEYFRAMES_ID ######
         frame_idx, image_paths = self.get_frame_info(idx_image)
-        return scores.flatten(), idx_image, frame_idx , image_paths
+        
+        return scores, idx_image, frame_idx , image_paths
 
-    def text_search_evalip(self, text: str, index=None, k=5, is_translate=True):
+    def text_search_evalip(self, text: str, index=None, is_mmr=False, lambda_param=0.5, k=5, is_translate=True):
         # translate
         if is_translate:
             text = str(translate_lib(text, to_lang='en'))
@@ -109,6 +117,7 @@ class FaissSearch:
 
         ###### SEARCHING #####
         index_choosed = self.index_evalip
+        k = k*2 if is_mmr else k
 
         if index is None:
             scores, idx_image = index_choosed.search(text_features, k=k)
@@ -117,12 +126,20 @@ class FaissSearch:
             scores, idx_image = index_choosed.search(text_features, k=k, 
                                                      params=faiss.SearchParametersIVF(sel=id_selector))
         idx_image = idx_image.flatten() 
+        scores = scores.flatten()
+
+        if is_mmr:
+            print("use MMR")
+            doc_embeddings = [self.index_evalip.reconstruct(int(idx)) for idx in idx_image]
+            selected_indices = maximal_marginal_relevance(text_features[0], doc_embeddings, lambda_param=lambda_param, top_k=k)
+            idx_image = np.array(idx_image)[selected_indices]
+            scores = scores[selected_indices]
 
         ###### GET INFOS KEYFRAMES_ID ######
         frame_idx, image_paths = self.get_frame_info(idx_image)
-        return scores.flatten(), idx_image, frame_idx , image_paths
+        return scores, idx_image, frame_idx , image_paths
     
-    def image_search(self, image_path, k=5, index=None):
+    def image_search(self, image_path, is_mmr=False, lambda_param=0.5, k=5, index=None):
         image = Image.open(image_path).convert("RGB")
         image_input = (self.evalip_preprocess(image) if not self.is_openclip 
                     else self.openclip_preprocess(image)).to(self.__device).unsqueeze(0)
@@ -135,6 +152,7 @@ class FaissSearch:
         # Normalize image features
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
         image_features = image_features.cpu().detach().numpy()
+        k = k*2 if is_mmr else k
 
         # Select FAISS index based on the model
         index_search = self.index_evalip if not self.is_openclip else self.index_open_clip
@@ -150,11 +168,20 @@ class FaissSearch:
 
         # Flatten and get additional info
         idx_image = idx_image.flatten()
+        scores = scores.flatten()
+
+        if is_mmr:
+            print("use MMR")
+            doc_embeddings = [index_search.reconstruct(int(idx)) for idx in idx_image]
+            selected_indices = maximal_marginal_relevance(image_features[0], doc_embeddings, lambda_param=lambda_param, top_k=k)
+            idx_image = np.array(idx_image)[selected_indices]
+            scores = scores[selected_indices]
+
         frame_idx, image_paths = self.get_frame_info(idx_image)
-        return scores.flatten(), idx_image, frame_idx, image_paths
+        return scores, idx_image, frame_idx, image_paths
 
     
-    def context_search(self, object_input, k=5 , index=None):
+    def context_search(self, object_input, is_mmr=False, lambda_param=0.5, k=5 , index=None):
         '''
         Example:
         inputs = {
@@ -166,10 +193,10 @@ class FaissSearch:
         }
         ''' 
         if object_input is not None:
-            scores, idx_image, frame_idx, image_paths = self.object_retrieval(object_input, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.object_retrieval(object_input, is_mmr=False, lambda_param=0.5, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     
-    def caption_search(self, texts, k=5, index=None, is_translate=True):
+    def caption_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None, is_translate=True):
         '''
         Example:
         texts = "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện."
@@ -177,34 +204,34 @@ class FaissSearch:
         if is_translate:
             texts = str(translate_lib(texts, to_lang='en'))
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.caption_retrieval(texts, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.caption_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     
-    def ocr_search(self, texts, k=5, index=None):
+    def ocr_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None):
         '''
         Example:
         texts = "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện."
         '''
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.ocr_retrieval(texts, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.ocr_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
 
-    def asr_search(self, texts, k=5, index=None):
+    def asr_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None):
         '''
         Example:
         texts = "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện."
         '''
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.asr_retrieval(texts, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.asr_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     
-    def tag_search(self, texts, k=5, index=None):
+    def tag_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None):
         '''
         Example:
         texts = "building sky tree"
         '''
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.tag_retrieval(texts, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.tag_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     def feelback(self, previous_results, positive_feedback_idxs, negative_feedback_idxs):
         
@@ -220,12 +247,13 @@ class FaissSearch:
 
         valid_video_ids = np.array(list(video_score_map.keys()), dtype='int64')
 
-        feedback_features = self.index_clip.reconstruct_batch(feedback_idxs)
+        index_search = self.index_evalip if not self.is_openclip else self.index_open_clip
+        feedback_features = index_search.reconstruct_batch(feedback_idxs)
 
         video_selector = faiss.IDSelectorArray(valid_video_ids)
         search_params = faiss.SearchParametersIVF(sel=video_selector)
 
-        feelback_scores, feelback_idx_images = self.index_clip.search(
+        feelback_scores, feelback_idx_images = index_search.search(
             feedback_features, 
             k=len(valid_video_ids), 
             params=search_params
@@ -247,7 +275,6 @@ class FaissSearch:
         image_paths = [info['image_path'] for info in video_info_list if info is not None]
 
         return feelbacked_scores, feelbacked_ids, feelbacked_framesID, image_paths
-    
 
 
 def main():

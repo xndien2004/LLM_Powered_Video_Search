@@ -67,14 +67,14 @@ def get_extra_noextra(idx_image, source):
     noextra_index = [idx_image[i] for i in range(len(source)) if source[i] == "no_extra"]
     return extra_index, noextra_index
 
-def search_by_type(search_type, search_func, source, text, index=None, k=None, list_results=None):
-    scores, idx_image, frame_idxs, image_paths = search_func(text, index=index, k=k)
+def search_by_type(search_type, search_func, source, text, is_mmr, lambda_param, index=None, k=None, list_results=None):
+    scores, idx_image, frame_idxs, image_paths = search_func(text, is_mmr=is_mmr, lambda_param=lambda_param, index=index, k=k)
     list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), [source]*len(frame_idxs)))
     print(f"{search_type} search complete")
 
-def run_search(choice_key, search_func, source, choice_dict, text, index, k, list_results):
+def run_search(choice_key, search_func, source, choice_dict, text, is_mmr, lambda_param, index, k, list_results):
     if choice_dict.get(choice_key):
-        search_by_type(choice_key.upper(), search_func, source=source, text=text, index=index, k=k, list_results=list_results)
+        search_by_type(choice_key.upper(), search_func, source=source, text=text, is_mmr=is_mmr, lambda_param=lambda_param, index=index, k=k, list_results=list_results)
 
 def get_index_image(json_data, keyframe):
     index_keyframe = []

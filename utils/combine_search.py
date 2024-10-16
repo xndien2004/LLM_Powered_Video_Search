@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
 def merge_searching_results(list_scores, list_indices, list_image_paths):
     '''
@@ -100,3 +101,51 @@ def combined_ranking_score(list_results, topk=None, alpha=0.5, beta=0.5, k=60):
         df = df.head(topk)
     
     return list(df['crs_scores']), list(df["idx_image"]), list(df['frame_idx']), list(df['image_paths']), list(df['source'])
+
+def maximal_marginal_relevance(query_embedding, doc_embeddings, lambda_param=0.5, top_k=5):
+    """
+    Áp dụng thuật toán Maximal Marginal Relevance (MMR) để chọn các kết quả dựa trên tính liên quan và đa dạng.
+    
+    Args:
+        query_embedding (np.array): Vector embedding của truy vấn.
+        doc_embeddings (np.array): Ma trận embedding của các tài liệu.
+        lambda_param (float): Tham số điều chỉnh giữa tính liên quan và tính đa dạng.
+        top_k (int): Số lượng kết quả trả về.
+
+    Returns:
+        selected_docs (list): Danh sách chỉ số của các tài liệu đã chọn.
+    """
+    # Tính độ tương đồng cosine giữa truy vấn và các tài liệu
+    query_similarities = cosine_similarity([query_embedding], doc_embeddings)[0]
+    
+    # Tính độ tương tự giữa các tài liệu với nhau
+    doc_pairwise_similarities = cosine_similarity(doc_embeddings)
+    
+    selected_docs = []
+    candidate_docs = list(range(len(doc_embeddings)))
+
+    # Chọn tài liệu có độ tương đồng lớn nhất với truy vấn làm kết quả đầu tiên
+    first_doc = np.argmax(query_similarities)
+    selected_docs.append(first_doc)
+    candidate_docs.remove(first_doc)
+    
+    # Lặp để chọn các tài liệu tiếp theo
+    for _ in range(top_k - 1):
+        mmr_scores = []
+        for doc in candidate_docs:
+            # Độ tương tự của tài liệu với truy vấn (liên quan)
+            relevance = query_similarities[doc]
+            
+            # Độ tương tự của tài liệu với những tài liệu đã được chọn (đa dạng)
+            diversity = max([doc_pairwise_similarities[doc][selected] for selected in selected_docs])
+            
+            # Tính điểm MMR
+            mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
+            mmr_scores.append(mmr_score)
+        
+        # Chọn tài liệu có điểm MMR cao nhất
+        next_doc = candidate_docs[np.argmax(mmr_scores)]
+        selected_docs.append(next_doc)
+        candidate_docs.remove(next_doc)
+    
+    return selected_docs

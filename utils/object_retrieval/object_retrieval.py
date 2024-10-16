@@ -9,6 +9,7 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from utils import combine_search
 from AIC.settings import MEDIA_ROOT
+from utils.combine_search import maximal_marginal_relevance
 
 class object_retrieval():
     def __init__(self, id2img_fps, dict_pkl_object_path, dict_npz_object_path):
@@ -41,11 +42,16 @@ class object_retrieval():
             sys.exit()
         return vectorize
 
-    def __call__(self, texts, k=100, index=None,sources=None):
+    def __call__(self, texts, is_mmr=False, lambda_param=0.5, k=100, index=None,sources=None):
         list_results = []
         for input_type in self.all_datatype:
             if texts[input_type] != '':
+                k = k*2 if is_mmr else k
                 scores_, idx_image_ = self.find_similar_score(texts[input_type], input_type, k, index=index)
+                if is_mmr:
+                    selected_indices = maximal_marginal_relevance(texts[input_type], self.context_matrix[input_type][idx_image_,:], lambda_param=lambda_param, top_k=k)
+                    idx_image_ = np.array(idx_image_)[selected_indices]
+                    scores_ = scores_[selected_indices]
                 infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
                 image_paths = [info['image_path'] for info in infos_query]
                 frame_idx = [info['frame_idx'] for info in infos_query]

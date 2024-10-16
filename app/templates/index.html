@@ -94,6 +94,11 @@
                         <option value="L22">L22</option>
                         <option value="L23">L23</option>
                         <option value="L24">L24</option>
+                        <option value="L25">L26</option>
+                        <option value="L27">L27</option>
+                        <option value="L28">L28</option>
+                        <option value="L29">L29</option>
+                        <option value="L30">L30</option> 
                     </select>
                     <div class="menu-frames-container">
                         <input type="checkbox" id="asr" class="menu-choice">
@@ -130,7 +135,10 @@
                         <div class="menu-name">No extra</div>
                     </div>
                     <div class="divider"></div>
-                    <div class="llm">LLM</div>
+                    <div class="menu-frames-container">
+                        <input id="lambda_param" class="lambda_param" placeholder="lambda param">
+                        <div class="menu-name">MMR</div>
+                    </div>
                     <div class="re-ranking">Re rank</div>
                     <div class="feelback-container">Feelback</div>
                 </div>
@@ -138,10 +146,18 @@
         </div>
         <div class="main-change-tab">
             <div class="main-change-tab-child">
-                <input type="text" class="name-query" value="query-data" placeholder="Name query">
-                <input type="text" class="name-QA" placeholder="Q&A">
-                <button id="download-query" title="Download Query">
+                <!-- <input type="text" class="name-query" value="query-data" placeholder="Name query">
+                <input type="text" class="name-QA" placeholder="Q&A"> -->
+                <!-- <button id="download-query" title="Download Query">
                     <i class="fas fa-download"></i>
+                </button> -->
+
+                <!-- div to server -->
+                <input class="name-video" placeholder="name-video" value="a">
+                <input class="pts-time" placeholder="pts-time" value="a">
+                <input class="name-QA" placeholder="Q&A">
+                <button id="send-server" title="Send server">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
         </div>
@@ -374,6 +390,10 @@
             <div class="chatbot">
                 <header>
                     <h2>Chatbot</h2>
+                    <div class="change-query-container">
+                        <div class="change-query-name">Change query</div>
+                        <input type="checkbox" checked>
+                    </div>
                     <span class="close-btn material-symbols-outlined">close</span>
                 </header>
                 <ul class="chatbox">
@@ -709,7 +729,23 @@
     const asr = document.querySelector('#asr');
     const imageGrid = document.querySelector('.image-grid'); 
     const options = document.querySelector('#options');
+    const lambdaParam = document.querySelector('.lambda_param');
+    let mmr = false;
 
+    // MMR
+    lambdaParam.addEventListener('change', function() {
+        if (lambdaParam.value) {
+            mmr = true;
+        } else {
+            mmr = false;
+        }
+    });
+
+    if (lambdaParam.value){
+        const mmr = true;
+    } else {
+        const mmr = false;
+    }
     const choiceDict = {};
     choiceQuery.forEach(choice => {
         choiceDict[choice.id] = choice.checked ? 1 : 0;
@@ -764,7 +800,7 @@
                     idx_IMG:JSON.parse(localStorage.getItem('video_info'))["idx_image"],
                     choiceExtraDict: choiceExtraDict,
                     source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
-                    options: options.value
+                    options: options.value, lambda_param: lambdaParam.value, is_mmr: mmr
                 }),
             })
             .then(response => response.json())
@@ -785,70 +821,124 @@
         }
     });
 
-    // LLM
-    const btnLLM = document.querySelector('.llm');
-    btnLLM.addEventListener('click', function() {
-        if (textSearch.value) {
-            loader.style.display = 'block';
-            fetch(`${API_URL}/api/llm/`, {
+    // download query
+    // const downloadQuery = document.querySelector('#download-query');
+    // const nameQuery = document.querySelector('.name-query');  
+    // const nameQA = document.querySelector('.name-QA');
+    // downloadQuery.addEventListener('click', function() {
+    //     const imageBlock = imageGrid.querySelectorAll('.image-block');
+    //     const frameIdxs = Array.from(imageBlock).map(block => parseInt(block.querySelector('.id-frame').textContent));
+    //     const videoID = Array.from(imageBlock).map(block => block.querySelector('img').src.split('/').slice(-2, -1)[0]);
+
+    //     if (nameQuery.value) {
+    //         const convertToCSV = (frameIdxs, videoID) => {
+    //             const csvRows = [];
+    //             for (let i = 0; i < frameIdxs.length; i++) { 
+    //                 if (nameQA.value) {
+    //                     csvRows.push(`${videoID[i]},${frameIdxs[i]},${parseInt(nameQA.value)}`);
+    //                 } else {
+    //                     csvRows.push(`${videoID[i]},${frameIdxs[i]}`);
+    //                 }
+    //             }
+    //             return csvRows.join('\n');
+    //         };
+
+    //         const csvData = convertToCSV(frameIdxs, videoID);
+    //         const blob = new Blob([csvData], { type: 'text/csv' });
+    //         const url = window.URL.createObjectURL(blob);
+    //         const a = document.createElement('a');
+    //         a.href = url;
+    //         a.download = `${nameQuery.value}.csv`;
+    //         a.click();
+    //         window.URL.revokeObjectURL(url);
+
+
+    //     } else {
+    //         alert('Please enter name query');
+    //     }
+    // });
+
+
+    // Send server
+    const nameVideo = document.querySelector('.name-video');
+    const ptsTime = document.querySelector('.pts-time');
+    const nameQA = document.querySelector('.name-QA');
+    const btnSendServer = document.querySelector('#send-server');
+    btnSendServer.addEventListener('click', function() {
+        if (nameVideo.value && ptsTime.value) {
+            fetch(`https://eventretrieval.one/api/v2/login`, {
                 method: 'POST',
                 headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': csrftoken
                     },
-                body: JSON.stringify({
-                    query: textSearch.value, number: numberSearch.value
-                }),
+                body: JSON.stringify({username: 'team26', password: 'sU3DVCbCWs'}),
             })
             .then(response => response.json())
-            .then(data => {                
-                formatOutput(data);
-                
-                loader.style.display = 'none';
+            .then(data => {
+                console.log("sessionId: ",data.sessionId);
+                fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${data.sessionId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("id: ",data[0].id);
+                    let body = {};
+                    if (nameQA.value) {
+                        // QA
+                        body = {"answerSets": [{
+                            "answers": [
+                                {
+                                    "text": `${nameQA.value}-${nameVideo.value}-${ptsTime.value}`,
+                                }]
+                            }]
+                        }
+                    }else{
+                        // KIS
+                        body = {"answerSets": [{
+                            "answers": [
+                                {
+                                    "mediaItemName": nameVideo.value,
+                                    "start": parseInt(ptsTime.value),
+                                    "end": parseInt(ptsTime.value)
+                                }]
+                            }]
+                        }
+                    }
+                    fetch(` https://eventretrieval.one/api/v2/submit/${data[0].id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken,
+                            'Authorization': `Bearer ${data[0].id}`
+                        },
+                        body: JSON.stringify(body)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
             })
             .catch(error => {
                 console.log(error);
-                loader.style.display = 'none';
             });
         } else {
-            alert('Please enter text to search');
-        }
-    });
-
-    // download query
-    const downloadQuery = document.querySelector('#download-query');
-    const nameQuery = document.querySelector('.name-query');  
-    const nameQA = document.querySelector('.name-QA');
-    downloadQuery.addEventListener('click', function() {
-        const imageBlock = imageGrid.querySelectorAll('.image-block');
-        const frameIdxs = Array.from(imageBlock).map(block => parseInt(block.querySelector('.id-frame').textContent));
-        const videoID = Array.from(imageBlock).map(block => block.querySelector('img').src.split('/').slice(-2, -1)[0]);
-
-        if (nameQuery.value) {
-            const convertToCSV = (frameIdxs, videoID) => {
-                const csvRows = [];
-                for (let i = 0; i < frameIdxs.length; i++) { 
-                    if (nameQA.value) {
-                        csvRows.push(`${videoID[i]},${frameIdxs[i]},${parseInt(nameQA.value)}`);
-                    } else {
-                        csvRows.push(`${videoID[i]},${frameIdxs[i]}`);
-                    }
-                }
-                return csvRows.join('\n');
-            };
-
-            const csvData = convertToCSV(frameIdxs, videoID);
-            const blob = new Blob([csvData], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${nameQuery.value}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-
-
-        } else {
-            alert('Please enter name query');
+            alert('Please enter name video, pts time');
         }
     });
 
@@ -868,6 +958,7 @@
                                 live_active: getLikeActive, dislive_active: getDislikeActive,
                                 choiceExtraDict: choiceExtraDict,
                                 source_query: JSON.parse(localStorage.getItem('video_info'))["source"]}),
+                                lambda_param: lambdaParam.value, is_mmr: mmr
         })
         .then(response => response.json())
         .then(data => {
@@ -1034,6 +1125,8 @@
             formData.append('nextScene', nextSceneImage_value);
             formData.append('choiceExtraDict', JSON.stringify(choiceExtraDict));
             formData.append('options', options.value);
+            formData.append('lambda_param', lambdaParam.value);
+            formData.append('is_mmr', mmr);
 
             fetch(`${API_URL}/api/image_query/`, {
                 method: 'POST',
@@ -1066,7 +1159,8 @@
                 'X-CSRFToken': csrftoken
             },
             body: JSON.stringify({ name_frame, id_video,
-                choiceExtraDict: choiceExtraDict
+                choiceExtraDict: choiceExtraDict,
+                lambda_param: lambdaParam.value, is_mmr: mmr
              }),
         })
         .then(response => response.json())
@@ -1260,7 +1354,7 @@
                 next_objects:next_objects, id_img_objects:JSON.parse(localStorage.getItem('video_info'))["idx_image"],
                 choiceExtraDict: choiceExtraDict,
                 source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
-                options: options.value
+                options: options.value, lambda_param: lambdaParam.value, is_mmr: mmr
             }),
         })
         .then(response => response.json())
@@ -1411,12 +1505,12 @@
             if (e.ctrlKey && e.key === 'a') {
                 e.preventDefault();
                 selectAllIcons();
-            } else if (e.ctrlKey && e.key === 'c') {
-                e.preventDefault();
-                copySelectedObjects();
-            } else if (e.ctrlKey && e.key === 'v') {
-                e.preventDefault();
-                pasteCopiedObjects();
+            // } else if (e.ctrlKey && e.key === 'c') {
+            //     e.preventDefault();
+            //     copySelectedObjects();
+            // } else if (e.ctrlKey && e.key === 'v') {
+            //     e.preventDefault();
+            //     pasteCopiedObjects();
             } else if (e.key === 'Delete') {
                 deleteSelectedObjects();
             }
@@ -1485,7 +1579,7 @@
                     id_Img: JSON.parse(localStorage.getItem('video_info'))["idx_image"],
                     choiceExtraDict: choiceExtraDict,
                     source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
-                    options: options.value
+                    options: options.value, lambda_param: lambdaParam.value, is_mmr: mmr
                 }),
             })
             .then(response => response.json())
@@ -1555,10 +1649,17 @@
     const chatbox = document.querySelector(".chatbox");
     const chatInput = document.querySelector(".chat-input textarea");
     const sendChatBtn = document.querySelector(".chat-input span");
+    const changeQuery = document.querySelector('.change-query-container input');
 
     let userMessage = null; // Variable to store user's message
     const inputInitHeight = chatInput.scrollHeight;
+    let statusChangeQuery;
 
+    changeQuery.addEventListener('change', function() {
+        statusChangeQuery = changeQuery.checked ? 1 : 0;
+    });
+    statusChangeQuery = changeQuery.checked ? 1 : 0;
+    
     const createChatLi = (message, className) => {
     // Create a chat <li> element with passed message and className
     const chatLi = document.createElement("li");
@@ -1580,13 +1681,13 @@
 
         // Send POST request to API, get response and set the reponse as paragraph text
         try {
-            fetch(`${API_URL}/api/llm_chatbot/`, {
+            fetch(`/api/llm_chatbot/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken
             },
-            body: JSON.stringify({ message: userMessage }),
+            body: JSON.stringify({ message: userMessage, changeQuery: statusChangeQuery}),
         })
             .then(response => response.json())
             .then(data => {
@@ -1594,7 +1695,7 @@
                 let reply = data.reply;
                 let frame_idxs1 = data.frame_idxs;
                 let image_paths1 = data.image_paths;
-                messageElement.textContent = reply.replace(/\*\*(.*?)\*\*/g, '$1');;
+                messageElement.textContent = reply;
 
                 if (frame_idxs1 && frame_idxs1.length > 0) {
                     const chatbotImageGrid = chatElement.querySelector(".chatbot-image-grid");

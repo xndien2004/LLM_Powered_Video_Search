@@ -42,6 +42,17 @@
 }
 
 /* feelback and rerank and llm */
+.lambda_param{
+    width: 30px;
+    border-radius: 5px;
+    border: 1px solid #d1d1d1;
+    outline: none;
+    padding: 5px;
+    font-size: 12px;
+}
+.lambda_param:focus {
+    border-color: #007bff;
+}
 .llm,
 .re-ranking,
 .feelback-container {
@@ -419,6 +430,8 @@
     border-color: #007bff;
 }
 
+.pts-time,
+.name-video,
 .name-QA{
     font-size: 12px;
     color: #333;
@@ -428,6 +441,8 @@
     outline: none;
     padding: 5px;
 }
+.pts-time:focus,
+.name-video:focus,
 .name-QA:focus {
     border-color: #007bff;
 }

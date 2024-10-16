@@ -72,6 +72,21 @@ header h2 {
   font-size: 1.4rem;
   margin-left: 20px;
 }
+
+.change-query-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 30px;
+}
+.change-query-container .change-query-name{
+  font-weight: 700;
+}
+.change-query-container input{
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
 .chatbot .chatbox {
   overflow-y: auto;
   height: calc(100vh - 250px);

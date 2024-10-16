@@ -18,8 +18,8 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 # features preparing
 tag_corpus_path = MEDIA_ROOT + '/tag/tag_corpus.txt'
 dict_path = {
-    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_openclip.bin',
-    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_EVACLIP.bin',
+    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_SigLIP384.bin', # SigLIP
+    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_DFN5B.bin', # dfn5b
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps.json',
     'map_asr_json_path': MEDIA_ROOT + '/map-asr.json',
     'dict_pkl_object_path': {
@@ -43,8 +43,8 @@ dict_path = {
 }
 
 dict_path_extra = {
-    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_openclip_extra.bin',
-    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_EVAclip_extra.bin',
+    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_SigLIP384_extra.bin', # SigLIP
+    'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_DFN5B_extra.bin', # dfn5b
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps_extra.json',
     'map_asr_json_path': MEDIA_ROOT + '/map-asr.json',
     'dict_pkl_object_path': {
@@ -71,8 +71,8 @@ keyword = "./keyword.txt"
 
 # load file
 is_extra = "no"
-is_openclip = True
-is_evalip = False
+is_openclip = False # SigLIP
+is_evalip = False # dfn5b
 is_object = False
 if is_extra == "no":
     cosine_faiss = faiss_search.FaissSearch(dict_path, is_openclip, is_object, is_evalip)
@@ -130,6 +130,12 @@ class TextSearchImage(APIView):
         source_query = request.data.get('source_query')
         choice_extra = request.data.get('choiceExtraDict')
         options = request.data.get('options')
+        is_mmr = request.data.get('is_mmr')
+        lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
+        print("lambda_param: ", lambda_param)
+        print("is_mmr: ", is_mmr) if is_mmr == True else 1
+        print("lambda_param: ", lambda_param)
+        print("is_mmr: ", is_mmr)
         print("options: ", options)
         idx_image = request.data.get("idx_IMG")
         idx_image = [int(id) for id in idx_image]
@@ -159,6 +165,8 @@ class TextSearchImage(APIView):
                     source=source, 
                     choice_dict=choice_dict, 
                     text=text, 
+                    is_mmr=is_mmr,
+                    lambda_param=lambda_param,
                     index=index, 
                     k=search_k, 
                     list_results=list_results
@@ -167,12 +175,12 @@ class TextSearchImage(APIView):
         def run_search_asr(source, options, choice_dict, text, index_asr, search_k, list_results, search_func):
             if choice_dict.get("asr"):
                 index_asr = get_index_image(cosine_faiss.map_asr, options)
-                scores, idx_image, frame_idxs, image_paths = search_func.asr_search(text, k=search_k, index=index_asr)
+                scores, idx_image, frame_idxs, image_paths = search_func.asr_search(text, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=index_asr)
                 list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), [source]*len(frame_idxs)))
 
         def run_search_asr_not_index(source, choice_dict, text, search_k, list_results, search_func):
             if choice_dict.get("asr"):
-                scores, idx_image, frame_idxs, image_paths = search_func.asr_search(text, k=search_k, index=None)
+                scores, idx_image, frame_idxs, image_paths = search_func.asr_search(text, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=None)
                 list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), [source]*len(frame_idxs)))
         if options == "All":
             if choice_extra.get("extra"):
@@ -182,7 +190,6 @@ class TextSearchImage(APIView):
                 run_all_searches("no_extra", cosine_faiss, noextra_index)
                 run_search_asr_not_index("no_extra", choice_dict, text, search_k, list_results, cosine_faiss)
         else:
-             
             if choice_extra.get("extra"):
                 index = get_index_image(cosine_faiss_extra.id2img_fps, options)
                 run_all_searches("extra", cosine_faiss_extra, index)
@@ -194,7 +201,7 @@ class TextSearchImage(APIView):
 
 
         # Combine the search results
-        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.7, beta=0.3)
+        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.6, beta=0.4)
         print("list_results: ", len(list_results))
 
         # Propose videos
@@ -219,6 +226,10 @@ class FilterSearch(APIView):
         next_objects = request.data.get("next_objects")
         source_query = request.data.get('source_query')
         choice_extra = request.data.get('choiceExtraDict')
+        is_mmr = request.data.get('is_mmr')
+        lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
+        print("lambda_param: ", lambda_param)
+        print("is_mmr: ", is_mmr)
         id_img_objects = request.data.get("id_img_objects")
         id_img_objects = [int(id) for id in id_img_objects]
 
@@ -228,16 +239,15 @@ class FilterSearch(APIView):
         search_k = len(id_img_objects) if next_objects else number
         
         list_results = []
-        start = time.time()
         if choice_extra.get("extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.context_search(filter_dict, k=search_k, index=extra_index)
+            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
         if choice_extra.get("no_extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss.context_search(filter_dict, k=search_k, index=noextra_index)
+            scores, idx_image, frame_idxs, image_paths = cosine_faiss.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
 
         # Combine the search results
-        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.7, beta=0.3)
+        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.6, beta=0.4)
         video_propose = sort_by_frequent_video(scores, idx_image, frame_idxs, image_paths)
         return Response({"scores":scores, "idx_image":idx_image, "frame_idxs":frame_idxs, 
                          "image_paths":image_paths, "video_propose":video_propose, "source":source}, status=status.HTTP_200_OK)
@@ -251,6 +261,10 @@ class ImageQuery(APIView):
         next_objects = int(request.data.get("nextScene"))
         source_query = request.data.get('source_query')
         choice_extra = json.loads(request.data.get('choiceExtraDict'))
+        is_mmr = request.data.get('is_mmr')
+        lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
+        print("lambda_param: ", lambda_param)
+        print("is_mmr: ", is_mmr)
         id_Img = request.data.get("id_Img") 
         id_Img = id_Img.split(",")
         id_Img = [int(id) for id in id_Img]
@@ -264,14 +278,14 @@ class ImageQuery(APIView):
 
         list_results = []
         if choice_extra.get("extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.image_search(image_path, k=search_k, index=extra_index)
+            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.image_search(image_path, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
         if choice_extra.get("no_extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss.image_search(image_path, k=search_k, index=noextra_index)
+            scores, idx_image, frame_idxs, image_paths = cosine_faiss.image_search(image_path, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
 
         # Combine the search results
-        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.7, beta=0.3)
+        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.6, beta=0.4)
         end = time.time()
         print("Time image search : ", end - start)
         os.remove(image_path) 
@@ -295,6 +309,10 @@ class TagQuery(APIView):
         next_scene = request.data.get("nextScene")
         source_query = request.data.get('source_query')
         choice_extra = request.data.get('choiceExtraDict')
+        is_mmr = request.data.get('is_mmr')
+        lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
+        print("lambda_param: ", lambda_param)
+        print("is_mmr: ", is_mmr)
         id_img = request.data.get('id_Img')
         id_img = [int(id) for id in id_img]
 
@@ -305,14 +323,14 @@ class TagQuery(APIView):
 
         list_results = []
         if choice_extra.get("extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.tag_search(tag_query, k=search_k, index=extra_index)
+            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
         if choice_extra.get("no_extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss.tag_search(tag_query, k=search_k, index=noextra_index)
+            scores, idx_image, frame_idxs, image_paths = cosine_faiss.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
 
         # Combine the search results
-        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.7, beta=0.3)
+        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.6, beta=0.4)
         end = time.time()
         print("Time tag search : ", end - start)
         video_propose = sort_by_frequent_video(scores, idx_image, frame_idxs, image_paths)
@@ -340,7 +358,7 @@ class ImageSearchCluster(APIView):
         end = time.time() 
 
         # Combine the search results
-        scores, idx_image, frame_idx, image_paths, source = combine_search.combined_ranking_score(list_results, topk=100, alpha=0.7, beta=0.3)
+        scores, idx_image, frame_idx, image_paths, source = combine_search.combined_ranking_score(list_results, topk=100, alpha=0.6, beta=0.4)
         print("Time image search : ", end - start) 
         return Response({"idx_frame":frame_idx,"image_paths":image_paths, "source":source}, status=status.HTTP_200_OK)
 class ClusterFrames(APIView): 
@@ -407,7 +425,10 @@ class LLM(APIView):
     def post(self, request):
         query = request.data.get('query')
         number = int(request.data.get('number'))
-
+        is_mmr = request.data.get('is_mmr')
+        lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
+        print("lambda_param: ", lambda_param)
+        print("is_mmr: ", is_mmr)
         datas = llm_auto.get_query_variants(query)
         list_results = []
         for data in datas:
@@ -415,23 +436,23 @@ class LLM(APIView):
             query = data.get('query')
             results = []
             if 'ocr' in method:
-                scores, idx_image, frame_idxs, image_paths = cosine_faiss.ocr_search(query, k=number, index=None)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.ocr_search(query, is_mmr=is_mmr, lambda_param=lambda_param, k=number, index=None)
                 results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
             if 'asr' in method:
-                scores, idx_image, frame_idxs, image_paths = cosine_faiss.asr_search(query, k=number, index=None)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.asr_search(query, is_mmr=is_mmr, lambda_param=lambda_param, k=number, index=None)
                 results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
             if 'openclip' in method:
-                scores, idx_image, frame_idxs, image_paths = cosine_faiss.text_search_openclip(query, k=number, index=None)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.text_search_openclip(query, is_mmr=is_mmr, lambda_param=lambda_param, k=number, index=None)
                 results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
             if 'evalip' in method:
-                scores, idx_image, frame_idxs, image_paths = cosine_faiss.text_search_evalip(query, k=number, index=None)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.text_search_evalip(query, is_mmr=is_mmr, lambda_param=lambda_param, k=number, index=None)
                 results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
             if 'caption' in method:
-                scores, idx_image, frame_idxs, image_paths = cosine_faiss.caption_search(query, k=number, index=None)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.caption_search(query, is_mmr=is_mmr, lambda_param=lambda_param, k=number, index=None)
                 results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
-            scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(results, topk=number, alpha=0.7, beta=0.3)
+            scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(results, topk=number, alpha=0.6, beta=0.4)
             list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), source))
-        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=number, alpha=0.7, beta=0.3)
+        scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=number, alpha=0.6, beta=0.4)
         video_propose = sort_by_frequent_video(scores, idx_image, frame_idxs, image_paths)
         return Response({"scores":scores, "idx_image":idx_image, "frame_idxs":frame_idxs, 
                          "image_paths":image_paths, "video_propose":video_propose, "source":source}, status=status.HTTP_200_OK)
@@ -439,15 +460,25 @@ class LLM(APIView):
 class LLMChatbot(APIView):
     def post(self, request):
         message = str(request.data.get('message'))
+        change_query = int(request.data.get('changeQuery'))
         
         model = "gpt-4o"
         temperature = 0.7
         history = []
         search = cosine_faiss
         text_path = keyword
-        bot = llm.get_llm(key_api=key_api, model=model, temperature=temperature, 
-                               history=history, search=search, text_path=text_path) 
-        bot_response = bot.generate_answer(message)
-        return Response({"reply":bot_response["reply"],
-                         "frame_idxs":bot_response["frame_idxs"],
-                         "image_paths":bot_response["image_paths"]}, status=status.HTTP_200_OK)
+        if change_query == 1:
+            reply = str(llm_auto.get_query_variants(message))
+            frame_idxs = []
+            image_paths = []
+        else:
+            bot = llm.get_llm(key_api=key_api, model=model, temperature=temperature, 
+                                history=history, search=search, text_path=text_path) 
+            bot_response = bot.generate_answer(message)
+            reply = bot_response["reply"]
+            frame_idxs = bot_response["frame_idxs"]
+            image_paths = bot_response["image_paths"]
+
+        return Response({"reply": reply,
+                         "frame_idxs":frame_idxs,
+                         "image_paths":image_paths}, status=status.HTTP_200_OK)

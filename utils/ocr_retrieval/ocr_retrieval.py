@@ -8,6 +8,7 @@ import json
 import re
 from utils import combine_search
 from AIC.settings import MEDIA_ROOT
+from utils.combine_search import maximal_marginal_relevance
 
 class ocr_retrieval():
     def __init__(self, id2img_fps, pkl_ocr_path, npz_ocr_path):
@@ -40,8 +41,15 @@ class ocr_retrieval():
         vectorize = self.tfidf_transform.transform([input_query])
         return vectorize
     
-    def __call__(self, texts, k=100, index=None,):
+    def __call__(self, texts, is_mmr=False, lambda_param=0.5, k=100, index=None,):
+        k = k*2 if is_mmr else k
         scores, idx_image_ = self.find_similar_score(texts, k, index=index)
+        if is_mmr:
+            print("use MMR")
+            selected_indices = maximal_marginal_relevance(texts, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)
+            idx_image_ = np.array(idx_image_)[selected_indices]
+            scores = scores[selected_indices]
+            
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
         image_paths = [info['image_path'] for info in infos_query]
         frame_idx = [info['frame_idx'] for info in infos_query]
