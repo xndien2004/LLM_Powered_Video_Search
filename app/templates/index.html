@@ -1579,7 +1579,7 @@
                     id_Img: JSON.parse(localStorage.getItem('video_info'))["idx_image"],
                     choiceExtraDict: choiceExtraDict,
                     source_query: JSON.parse(localStorage.getItem('video_info'))["source"],
-                    options: options.value, lambda_param: lambdaParam.value, is_mmr: mmr
+                    options: options.value, lambda_param: lambdaParam.value, is_mmr: mmr,
                 }),
             })
             .then(response => response.json())
@@ -1615,7 +1615,7 @@
             const tags = tagSelectBox.querySelectorAll('.tag-select');
             const tagNames = Array.from(tags).map(tag => tag.textContent);
             const nextSceneTag = document.querySelector(".next-scene-tag");
-            fetchTagsSearch(tagNames.join(' '), numberSearch.value, nextSceneTag);
+            fetchTagsSearch(tagNames.join(' '), numberSearch.value, nextSceneTag, options);
         }
     });
 

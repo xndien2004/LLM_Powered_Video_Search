@@ -70,7 +70,7 @@ key_api = "D:/Wordspace/Python/paper_competition/key_gpt.txt"
 keyword = "./keyword.txt"
 
 # load file
-is_extra = "no"
+is_extra = "both" # ["no", "yes", "both"]
 is_openclip = False # SigLIP
 is_evalip = False # dfn5b
 is_object = False
@@ -226,6 +226,7 @@ class FilterSearch(APIView):
         next_objects = request.data.get("next_objects")
         source_query = request.data.get('source_query')
         choice_extra = request.data.get('choiceExtraDict')
+        options = request.data.get('options')
         is_mmr = request.data.get('is_mmr')
         lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
         print("lambda_param: ", lambda_param)
@@ -239,12 +240,22 @@ class FilterSearch(APIView):
         search_k = len(id_img_objects) if next_objects else number
         
         list_results = []
-        if choice_extra.get("extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
-            list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
-        if choice_extra.get("no_extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
-            list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
+        if options == "All":
+            if choice_extra.get("extra"):
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
+            if choice_extra.get("no_extra"):
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
+        else:
+            if choice_extra.get("extra"):
+                index = get_index_image(cosine_faiss_extra.id2img_fps, options)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
+            if choice_extra.get("no_extra"):
+                index = get_index_image(cosine_faiss.id2img_fps, options)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.context_search(filter_dict, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
 
         # Combine the search results
         scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.6, beta=0.4)
@@ -309,6 +320,7 @@ class TagQuery(APIView):
         next_scene = request.data.get("nextScene")
         source_query = request.data.get('source_query')
         choice_extra = request.data.get('choiceExtraDict')
+        options = request.data.get('options')
         is_mmr = request.data.get('is_mmr')
         lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
         print("lambda_param: ", lambda_param)
@@ -322,12 +334,22 @@ class TagQuery(APIView):
         search_k = len(id_img) if next_scene else number
 
         list_results = []
-        if choice_extra.get("extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
-            list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
-        if choice_extra.get("no_extra"):
-            scores, idx_image, frame_idxs, image_paths = cosine_faiss.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
-            list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
+        if options == "All":
+            if choice_extra.get("extra"):
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=extra_index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
+            if choice_extra.get("no_extra"):
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=noextra_index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
+        else:
+            if choice_extra.get("extra"):
+                index = get_index_image(cosine_faiss_extra.id2img_fps, options)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss_extra.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["extra"]*len(frame_idxs)))
+            if choice_extra.get("no_extra"):
+                index = get_index_image(cosine_faiss.id2img_fps, options)
+                scores, idx_image, frame_idxs, image_paths = cosine_faiss.tag_search(tag_query, is_mmr=is_mmr, lambda_param=lambda_param, k=search_k, index=index)
+                list_results.append((scores, idx_image, frame_idxs, image_paths, list(range(1, len(frame_idxs) + 1)), ["no_extra"]*len(frame_idxs)))
 
         # Combine the search results
         scores, idx_image, frame_idxs, image_paths, source = combine_search.combined_ranking_score(list_results, topk=search_k, alpha=0.6, beta=0.4)
