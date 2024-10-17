@@ -17,6 +17,8 @@
     <!-- Google Fonts Link For Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
     <script src="script.js" defer></script>
 </head>
 <body>
@@ -153,8 +155,8 @@
                 </button> -->
 
                 <!-- div to server -->
-                <input class="name-video" placeholder="name-video" value="a">
-                <input class="pts-time" placeholder="pts-time" value="a">
+                <input class="name-video" placeholder="name-video">
+                <input class="pts-time" placeholder="pts-time">
                 <input class="name-QA" placeholder="Q&A">
                 <button id="send-server" title="Send server">
                     <i class="fas fa-paper-plane"></i>
@@ -444,10 +446,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="{% static 'js/others.js' %}"></script>
     <script src="{% static 'js/jquery_colect.js' %}"></script>
     <script> 
     const API_URL = "";
+
+    // info susscess
+    function infoSusscess(text) {
+        $(document).ready(function() {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": true,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "1500",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "hide"
+            }
+
+            toastr.success(text);
+        });
+    }
+    // info error
+    function infoError(text) {
+        $(document).ready(function() {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": true,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "1500",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "hide"
+            }
+
+            toastr.error(text);
+        });
+    }
     // cookie
     function getCookie(name) {
         let cookieValue = null;
@@ -865,82 +917,97 @@
     const nameQA = document.querySelector('.name-QA');
     const btnSendServer = document.querySelector('#send-server');
     btnSendServer.addEventListener('click', function() {
+        let sessionId = '';
         if (nameVideo.value && ptsTime.value) {
             fetch(`https://eventretrieval.one/api/v2/login`, {
                 method: 'POST',
                 headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
                 body: JSON.stringify({username: 'team26', password: 'sU3DVCbCWs'}),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Login failed! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log("sessionId: ",data.sessionId);
-                fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${data.sessionId}`, {
+                console.log("sessionId: ", data.sessionId);
+                sessionId = data.sessionId;
+                
+                return fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${sessionId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
+                        // 'Authorization': `Bearer ${sessionId}`
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("id: ",data[0].id);
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to retrieve evaluation list! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.length > 0) {
+                    console.log("id: ", `https://eventretrieval.one/api/v2/submit/${data[0].id}`);
                     let body = {};
                     if (nameQA.value) {
                         // QA
-                        body = {"answerSets": [{
-                            "answers": [
-                                {
+                        body = {
+                            "answerSets": [{
+                                "answers": [{
                                     "text": `${nameQA.value}-${nameVideo.value}-${ptsTime.value}`,
                                 }]
                             }]
-                        }
-                    }else{
+                        };
+                    } else {
                         // KIS
-                        body = {"answerSets": [{
-                            "answers": [
-                                {
+                        body = {
+                            "answerSets": [{
+                                "answers": [{
                                     "mediaItemName": nameVideo.value,
                                     "start": parseInt(ptsTime.value),
                                     "end": parseInt(ptsTime.value)
                                 }]
                             }]
-                        }
+                        };
                     }
-                    fetch(` https://eventretrieval.one/api/v2/submit/${data[0].id}`, {
+                    
+                    return fetch(`https://eventretrieval.one/api/v2/submit/${data[0].id}?session=${sessionId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRFToken': csrftoken,
-                            'Authorization': `Bearer ${data[0].id}`
+                            // 'X-CSRFToken': csrftoken,
                         },
                         body: JSON.stringify(body)
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .catch(error => {
-                        console.log(error);
                     });
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+                } else {
+                    throw new Error("No evaluation data found!");
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Submission failed! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                infoSusscess("Send server success");
             })
             .catch(error => {
-                console.log(error);
+                console.error("Error: ", error.message);
+                infoError("Send server failed");
             });
         } else {
             alert('Please enter name video, pts time');
         }
     });
+
 
     // like and dislike (feelback)
     const feelbackContainer = document.querySelector('.feelback-container');

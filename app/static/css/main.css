@@ -267,3 +267,10 @@ button {
 .tag-search-bboxes:focus {
     border-color: #66afe9;
 }
+
+/* info */
+#toast-container {
+    top: 100px !important; 
+    opacity: 0.8 !important;
+    /* right: 20px !important;  */
+}
