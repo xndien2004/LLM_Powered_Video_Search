@@ -11,6 +11,7 @@ import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from utils import combine_search
 from django.conf import settings
+from AIC.settings import MEDIA_ROOT
 
 # class CPU_Unpickler(pickle.Unpickler):
 #     def find_class(self, module, name):
@@ -20,7 +21,7 @@ from django.conf import settings
 
 class media_info_retrieval():
     def __init__(self, id2img_fps, dict_pkl_media_info_path, dict_npz_media_info_path):
-        tfids_media_info_path = settings.MEDIA_ROOT+'/contexts_bin/'
+        tfids_media_info_path = MEDIA_ROOT+'/contexts_bin/'
         self.all_datatype = ['description', 'title']
         self.tfidf_transform = {}
         self.context_matrix = {}
@@ -29,7 +30,7 @@ class media_info_retrieval():
                 self.tfidf_transform[data_type] = pickle.load(f)
             self.context_matrix[data_type] = scipy.sparse.load_npz(tfids_media_info_path + dict_npz_media_info_path[data_type])
 
-        self.id2img_fps = id2img_fps
+        self.id2img_fps = self.load_json_file(id2img_fps)
 
     def transform_input(self, input_query:str, transform_type:str,):
         '''
@@ -53,7 +54,7 @@ class media_info_retrieval():
         list_results = []
         for input_type in self.all_datatype:
             if texts[input_type] != '':
-                scores_, idx_video = self.find_similar_score(texts[input_type], input_type, k, index=index)
+                scores_, idx_video = self.find_similar_score(text=texts[input_type], transform_type=input_type, k=k, index=index)
                 infos_query = list(map(self.id2img_fps.get, list(idx_video)))
                 video_paths = [info['video_path'] for info in infos_query]
                 watch_urls = [info['watch_url'] for info in infos_query]

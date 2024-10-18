@@ -40,7 +40,7 @@
                 </div>
                 <div class="actions" style="display: none;">
                     <div class="menu-frames-container">
-                        <input type="checkbox" id="title" class="menu-choice">
+                        <input type="checkbox" id="title" class="menu-choice" checked>
                         <div class="menu-name">Title</div>
                     </div>
                     <div class="menu-frames-container">
@@ -62,7 +62,7 @@
             </div>
         </main>
         <!-- navright -->
-        <nav id="navRight" class="nav-right" style="display: block;">
+        <nav id="navRight" class="nav-right" style="display: none;">
             <!-- Navigation content -->
             <div class="right-container">
                 <div class="right-header">
@@ -108,6 +108,11 @@
             }
             return cookieValue;
         }
+        function getYoutubeVideoId(url) {
+            const regex = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
         const csrftoken = getCookie('csrftoken');
         const textSearch = document.getElementById('text-search');
         const numberSearch = document.querySelector('.number-search');
@@ -116,6 +121,7 @@
         const titleCheckbox = document.getElementById('title');
         const descriptionCheckbox = document.getElementById('description');
         const loader = document.querySelector('.loader');
+        const closeNavRight = document.querySelector('.close-nav-right');
      
         btnTextSearch.addEventListener('click', function() {
             const text = textSearch.value;
@@ -134,11 +140,15 @@
             })
             .then(response => response.json())
             .then(data => {
+                const video_name = data.video_name;
+                const watch_urls = data.watch_urls;
+                localStorage.setItem('watch_urls', JSON.stringify(watch_urls));
+                localStorage.setItem('video_name', JSON.stringify(video_name));
                 imageContent.innerHTML = '';
-                data.forEach(item => {
+                video_name.forEach(item => {
                     const div = document.createElement('button');
                     div.classList.add('id-video');
-                    div.textContent = item.video_name;
+                    div.textContent = item;
                     imageContent.appendChild(div);
                 });
                 loader.style.display = 'none';
@@ -146,6 +156,37 @@
             .catch(error => {
                 console.error('Error:', error);
             });
+        });
+
+        // click open video
+        imageContent.addEventListener('click', function(e) {
+            if (e.target.classList.contains('id-video')) {
+                const videoBlock = e.target;
+                const videoBlocks = document.querySelectorAll('#imageContent .id-video');
+                videoBlocks.forEach(block => {
+                    block.classList.remove('image-block-active');
+                });
+
+                // Thêm lớp 'image-block-active' cho khối được click
+                videoBlock.classList.add('image-block-active');
+                
+                const id = e.target.textContent;
+                const watch_urls = JSON.parse(localStorage.getItem('watch_urls'));
+                const video_name = JSON.parse(localStorage.getItem('video_name'));
+                const url = getYoutubeVideoId(watch_urls[video_name.indexOf(id)]);
+                const iframe = document.querySelector('.right-video-container iframe');
+                iframe.src = `https://youtube.com/embed/${url}?start=0`;
+                document.getElementById('navRight').style.display = 'block';
+
+                // right-id-video
+                const rightIdVideo = document.querySelector('.right-id-video');
+                rightIdVideo.textContent = id;
+            }
+        });
+
+        // close nav-right
+        closeNavRight.addEventListener('click', function() {
+            document.getElementById('navRight').style.display = 'none';
         });
     </script>
 </body>

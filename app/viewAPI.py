@@ -26,11 +26,11 @@ dict_path = {
     'id2video_json_path': MEDIA_ROOT + '/id2video.json',
     "dict_pkl_media_info_path": {
         'description': '/pkl/tfidf_transform_description.pkl',
-        'title': '/npz/sparse_context_matrix_title.npz',
+        'title': '/pkl/tfidf_transform_title.pkl'
     },
     'dict_npz_media_info_path': {
         'description': '/npz/sparse_context_matrix_description.npz',
-        'title': '/pkl/tfidf_transform_title.pkl',
+        'title': '/npz/sparse_context_matrix_title.npz'
     },
     'dict_pkl_object_path': {
         'number': '/pkl/tfidf_transform_number.pkl',
@@ -52,7 +52,7 @@ dict_path = {
     'dict_npz_tag_path': '/npz/sparse_context_matrix_tag.npz'
 }
 
-dict_path_extra = {
+dict_path_extra = { 
     'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_SigLIP384_extra.bin', # SigLIP
     'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_DFN5B_extra.bin', # dfn5b
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps_extra.json',
@@ -77,11 +77,11 @@ dict_path_extra = {
     'dict_npz_tag_path': '/npz_extra/sparse_context_matrix_tag.npz'
 }
 
-key_api = "D:/Wordspace/Python/paper_competition/key_gpt.txt"
-keyword = "./keyword.txt"
+key_api = "utils/key_gpt.txt"
+keyword = "utils/keyword.txt"
 
 # load file
-is_extra = "no" # ["no", "yes", "both"]
+is_extra = "1" # ["no", "yes", "both"]
 is_openclip = False # SigLIP
 is_evalip = False # dfn5b
 is_object = False
@@ -92,6 +92,9 @@ elif is_extra == "yes":
 elif is_extra == "both":
     cosine_faiss = faiss_search.FaissSearch(dict_path, is_openclip, is_object, is_evalip)
     cosine_faiss_extra = faiss_search.FaissSearch(dict_path_extra, is_openclip, is_object, is_evalip)
+
+# media info retrieval
+media_info = media_info_retrieval.media_info_retrieval(dict_path["id2video_json_path"], dict_path['dict_pkl_media_info_path'], dict_path['dict_npz_media_info_path'])
 
 # LLM
 llm_auto = llm_retrieval.QueryProcessor(api_key_path=key_api)
@@ -531,6 +534,8 @@ class MediaInfoVideo(APIView):
             query_dict["description"] = query
         else:
             query_dict["description"] = ''
-        scores, idx_video, watch_urls, video_name = cosine_faiss.media_info_search(query_dict, k=number, sources="video")
+        print("query_dict: ", query_dict)
+        print("number: ", number)
+        scores, idx_video, watch_urls, video_name = media_info(query_dict, k=number, sources="video")
         return Response({"scores": scores, "idx_video":idx_video,
                          "watch_urls":watch_urls, "video_name":video_name}, status=status.HTTP_200_OK)
