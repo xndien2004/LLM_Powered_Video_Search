@@ -5,18 +5,19 @@ import numpy as np
 import scipy
 import pickle
 import json
-import re 
+import re
+from utils import combine_search
 from AIC.settings import MEDIA_ROOT
 from utils.combine_search import maximal_marginal_relevance
 
-class asr_retrieval():
-    def __init__(self, id2img_fps, pkl_asr_path, npz_asr_path):
-        tfids_asr_path = MEDIA_ROOT+'/contexts_bin/'
+class CaptionRetrieval():
+    def __init__(self, id2img_fps, pkl_caption_path, npz_caption_path):
+        tfids_caption_path = MEDIA_ROOT+'/contexts_bin/'
         self.tfidf_transform = None
         self.context_matrix = None
-        with open(tfids_asr_path + pkl_asr_path, 'rb') as f:
+        with open(tfids_caption_path + pkl_caption_path, 'rb') as f:
             self.tfidf_transform = pickle.load(f)
-        self.context_matrix = scipy.sparse.load_npz(tfids_asr_path + npz_asr_path)
+        self.context_matrix = scipy.sparse.load_npz(tfids_caption_path + npz_caption_path)
     
         self.id2img_fps = id2img_fps
     
@@ -41,7 +42,7 @@ class asr_retrieval():
     
     def __call__(self, texts, is_mmr=False, lambda_param=0.5, k=100, index=None,):
         k = k*2 if is_mmr else k
-        scores, idx_image_ = self.find_similar_score(texts, k=k, index=index)
+        scores, idx_image_ = self.find_similar_score(texts, k, index=index)
         if is_mmr:
             print("use MMR")
             selected_indices = maximal_marginal_relevance(texts, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)
@@ -69,10 +70,4 @@ class asr_retrieval():
             scores = scores[sort_index]
             sort_index = np.array(index)[sort_index]
         return scores, sort_index
-
-
-if __name__ == "__main__":
-    query = "Xin chao"
-    asr = asr_retrieval()
-    print(asr(query, k=5))
 

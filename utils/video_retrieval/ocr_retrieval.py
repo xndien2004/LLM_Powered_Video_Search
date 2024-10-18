@@ -10,14 +10,14 @@ from utils import combine_search
 from AIC.settings import MEDIA_ROOT
 from utils.combine_search import maximal_marginal_relevance
 
-class caption_retrieval():
-    def __init__(self, id2img_fps, pkl_caption_path, npz_caption_path):
-        tfids_caption_path = MEDIA_ROOT+'/contexts_bin/'
+class OcrRetrieval():
+    def __init__(self, id2img_fps, pkl_ocr_path, npz_ocr_path):
+        tfids_ocr_path = MEDIA_ROOT+'/contexts_bin/'
         self.tfidf_transform = None
         self.context_matrix = None
-        with open(tfids_caption_path + pkl_caption_path, 'rb') as f:
+        with open(tfids_ocr_path + pkl_ocr_path, 'rb') as f:
             self.tfidf_transform = pickle.load(f)
-        self.context_matrix = scipy.sparse.load_npz(tfids_caption_path + npz_caption_path)
+        self.context_matrix = scipy.sparse.load_npz(tfids_ocr_path + npz_ocr_path)
     
         self.id2img_fps = id2img_fps
     
@@ -48,6 +48,7 @@ class caption_retrieval():
             selected_indices = maximal_marginal_relevance(texts, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)
             idx_image_ = np.array(idx_image_)[selected_indices]
             scores = scores[selected_indices]
+            
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
         image_paths = [info['image_path'] for info in infos_query]
         frame_idx = [info['pts_time'] for info in infos_query]

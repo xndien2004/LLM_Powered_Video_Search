@@ -5,32 +5,24 @@ import scipy
 import pickle
 import numpy as np
 import json
-import torch
-import io
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from utils import combine_search
-from django.conf import settings
 from AIC.settings import MEDIA_ROOT
+from utils.combine_search import maximal_marginal_relevance
 
-# class CPU_Unpickler(pickle.Unpickler):
-#     def find_class(self, module, name):
-#         if module == 'torch.storage' and name == '_load_from_bytes':
-#             return lambda b: torch.load(io.BytesIO(b), map_location='cpu')
-#         else: return super().find_class(module, name)
-
-class media_info_retrieval():
-    def __init__(self, id2img_fps, dict_pkl_media_info_path, dict_npz_media_info_path):
-        tfids_media_info_path = MEDIA_ROOT+'/contexts_bin/'
-        self.all_datatype = ['description', 'title']
+class ObjectRetrieval():
+    def __init__(self, id2img_fps, dict_pkl_object_path, dict_npz_object_path):
+        tfids_object_path = MEDIA_ROOT+'/contexts_bin/' #'bbox', 'color','tag_bbox',
+        self.all_datatype = ['number', 'number_tag','synthetic']
         self.tfidf_transform = {}
         self.context_matrix = {}
         for data_type in self.all_datatype:
-            with open(tfids_media_info_path + dict_pkl_media_info_path[data_type], 'rb') as f:
+            with open(tfids_object_path + dict_pkl_object_path[data_type], 'rb') as f:
                 self.tfidf_transform[data_type] = pickle.load(f)
-            self.context_matrix[data_type] = scipy.sparse.load_npz(tfids_media_info_path + dict_npz_media_info_path[data_type])
+            self.context_matrix[data_type] = scipy.sparse.load_npz(tfids_object_path + dict_npz_object_path[data_type])
 
-        self.id2img_fps = self.load_json_file(id2img_fps)
+        self.id2img_fps = id2img_fps
 
     def transform_input(self, input_query:str, transform_type:str,):
         '''
@@ -50,18 +42,29 @@ class media_info_retrieval():
             sys.exit()
         return vectorize
 
-    def __call__(self, texts, k=100, index=None,sources=None):
+    def __call__(self, texts, is_mmr=False, lambda_param=0.5, k=100, index=None,sources=None):
         list_results = []
         for input_type in self.all_datatype:
             if texts[input_type] != '':
-                scores_, idx_video = self.find_similar_score(text=texts[input_type], transform_type=input_type, k=k, index=index)
-                infos_query = list(map(self.id2img_fps.get, list(idx_video)))
-                video_paths = [info['video_path'] for info in infos_query]
-                watch_urls = [info['watch_url'] for info in infos_query]
-                list_results.append((scores_, idx_video, watch_urls, video_paths, list(range(1,len(watch_urls)+1)),[sources]*len(watch_urls)))
+                k = k*2 if is_mmr else k
+                scores_, idx_image_ = self.find_similar_score(texts[input_type], input_type, k, index=index)
+                if is_mmr:
+                    selected_indices = maximal_marginal_relevance(texts[input_type], self.context_matrix[input_type][idx_image_,:], lambda_param=lambda_param, top_k=k)
+                    idx_image_ = np.array(idx_image_)[selected_indices]
+                    scores_ = scores_[selected_indices]
+                infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
+                image_paths = [info['image_path'] for info in infos_query]
+                frame_idx = [info['pts_time'] for info in infos_query]
+                list_results.append((scores_, idx_image_, frame_idx, image_paths, list(range(1,len(frame_idx)+1)),[sources]*len(frame_idx)))
         
-        scores, idx_video, watch_urls, video_paths,_ = combine_search.combined_ranking_score(list_results, alpha=0.5, beta=0.5)
-        return scores, idx_video, watch_urls, video_paths  
+        scores, idx_image, frame_idx, image_paths,_ = combine_search.combined_ranking_score(list_results, alpha=0.5, beta=0.5)
+        
+        # scores, idx_image = combine_search.merge_searching_results_by_addition(scores, idx_image)
+
+        # infos_query = list(map(self.id2img_fps.get, list(idx_image)))
+        # image_paths = [info['image_path'] for info in infos_query]
+        # frame_idx = [info['frame_idx'] for info in infos_query]
+        return scores, idx_image, frame_idx, image_paths  
 
 
     def find_similar_score(

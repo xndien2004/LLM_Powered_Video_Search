@@ -10,7 +10,7 @@ from utils import combine_search
 from AIC.settings import MEDIA_ROOT
 from utils.combine_search import maximal_marginal_relevance
 
-class tag_retrieval():
+class TagRetrieval():
     def __init__(self, id2img_fps, pkl_tag_path, npz_tag_path):
         tfids_tag_path = MEDIA_ROOT+'/contexts_bin/'
         self.tfidf_transform = None

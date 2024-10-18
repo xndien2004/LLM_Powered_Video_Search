@@ -9,12 +9,7 @@ import gc
 import open_clip
 
 from .nlp_processing import translate_lib
-from .object_retrieval.object_retrieval import object_retrieval
-from .caption_retrieval.caption_retrieval import caption_retrieval
-from .ocr_retrieval.ocr_retrieval import ocr_retrieval
-from .asr_retrieval.asr_retrieval import asr_retrieval
-from .tag_retrieval.tag_retrieval import tag_retrieval
-from .media_info_retrieval.media_info_retrieval import media_info_retrieval
+from .video_retrieval import asr_retrieval, caption_retrieval, ocr_retrieval, tag_retrieval, object_retrieval
 from .combine_search import maximal_marginal_relevance
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -22,12 +17,11 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 class FaissSearch:
     def __init__(self, dict_path: dict, is_openclip=False, is_object=False, is_evalip=False):     
         self.id2img_fps = self.load_json_file(dict_path['id2img_fps_json_path'])
-        # self.map_asr = self.load_json_file(dict_path['map_asr_json_path'])
-        self.caption_retrieval = caption_retrieval(self.id2img_fps, dict_path['pkl_caption_path'], dict_path['npz_caption_path'])
-        self.ocr_retrieval = ocr_retrieval(self.id2img_fps, dict_path['dict_pkl_ocr_path'], dict_path['dict_npz_ocr_path'])
-        self.asr_retrieval = asr_retrieval(self.map_asr, dict_path['dict_pkl_asr_path'], dict_path['dict_npz_asr_path'])
-        self.tag_retrieval = tag_retrieval(self.id2img_fps, dict_path['dict_pkl_tag_path'], dict_path['dict_npz_tag_path'])
-        # self.media_info_retrieval = media_info_retrieval(dict_path['id2video_json_path'], dict_path['dict_npz_media_info_path'], dict_path['dict_npz_media_info_path'])
+        self.map_asr = self.load_json_file(dict_path['map_asr_json_path'])
+        self.caption_retrieval = caption_retrieval.CaptionRetrieval(self.id2img_fps, dict_path['pkl_caption_path'], dict_path['npz_caption_path'])
+        self.ocr_retrieval = ocr_retrieval.OcrRetrieval(self.id2img_fps, dict_path['dict_pkl_ocr_path'], dict_path['dict_npz_ocr_path'])
+        self.asr_retrieval = asr_retrieval.ASRRetrieval(self.map_asr, dict_path['dict_pkl_asr_path'], dict_path['dict_npz_asr_path'])
+        self.tag_retrieval = tag_retrieval.TagRetrieval(self.id2img_fps, dict_path['dict_pkl_tag_path'], dict_path['dict_npz_tag_path'])
         self.__device = "cuda" if torch.cuda.is_available() else "cpu" 
         
         self.is_openclip = is_openclip
@@ -236,16 +230,6 @@ class FaissSearch:
             scores, idx_image, frame_idx, image_paths = self.tag_retrieval(texts, is_mmr=is_mmr, lambda_param=lambda_param, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
         
-    # def media_info_search(self, texts, k=5, index=None):
-    #     '''
-    #     Example:
-    #     texts = {
-    #         'description': "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện.",
-    #         'title': "Bản tin HTV7 HD"
-    #     }
-    #     '''
-    #     scores, idx_video, watch_urls, video_paths = self.media_info_retrieval(texts, k=k, index=index, sources="video")
-    #     return scores, idx_video, watch_urls, video_paths
     def feelback(self, previous_results, positive_feedback_idxs, negative_feedback_idxs):
         
         feedback_idxs = np.array(positive_feedback_idxs + negative_feedback_idxs, dtype='int64')

@@ -878,7 +878,7 @@
     const nameQA = document.querySelector('.name-QA');
     const btnSendServer = document.querySelector('#send-server');
     btnSendServer.addEventListener('click', function() {
-        let sessionId = '';
+        let sessionId = 'NqkYynbdIj_P2a6-5KhiDlSSUiYjW04F';
         if (nameVideo.value && ptsTime.value) {
             fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${sessionId}`, {
                 method: 'GET',
@@ -888,9 +888,9 @@
                 }
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to retrieve evaluation list! Status: ${response.status}`);
-                }
+                // if (!response.ok) {
+                //     throw new Error(`Failed to retrieve evaluation list! Status: ${response.status}`);
+                // }
                 return response.json();
             })
             .then(data => {
@@ -932,18 +932,19 @@
                 }
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Submission failed! Status: ${response.status}`);
-                }
+                // if (!response.ok) {
+                //     throw new Error(`Submission failed! Status: ${response.status}`);
+                // }
                 return response.json();
             })
             .then(data => {
                 console.log(data);
-                infoSusscess("Send server success");
+                // infoSusscess(`Submit success ${nameQA.value}-${nameVideo.value}-${ptsTime.value}`);
+                infoSusscess(data.description); 
             })
             .catch(error => {
-                console.error("Error: ", error.message);
-                infoError("Send server failed");
+                console.log("Error: ", error);
+                infoError(error.description);
             });
         } else {
             alert('Please enter name video, pts time');

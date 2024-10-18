@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import pandas as pd
 from utils import faiss_search,langchain_search, combine_search
-from utils.media_info_retrieval import media_info_retrieval
+from utils.video_retrieval import media_info_retrieval
 from utils.LLM import llm_retrieval, llm
 from .data_utils import *
 from AIC.settings import MEDIA_ROOT, STATICFILES_DIRS
@@ -81,7 +81,7 @@ key_api = "utils/key_gpt.txt"
 keyword = "utils/keyword.txt"
 
 # load file
-is_extra = "1" # ["no", "yes", "both"]
+is_extra = "no" # ["no", "yes", "both"]
 is_openclip = False # SigLIP
 is_evalip = False # dfn5b
 is_object = False
@@ -94,7 +94,7 @@ elif is_extra == "both":
     cosine_faiss_extra = faiss_search.FaissSearch(dict_path_extra, is_openclip, is_object, is_evalip)
 
 # media info retrieval
-media_info = media_info_retrieval.media_info_retrieval(dict_path["id2video_json_path"], dict_path['dict_pkl_media_info_path'], dict_path['dict_npz_media_info_path'])
+media_info = media_info_retrieval.MediaInfoRetrieval(dict_path["id2video_json_path"], dict_path['dict_pkl_media_info_path'], dict_path['dict_npz_media_info_path'])
 
 # LLM
 llm_auto = llm_retrieval.QueryProcessor(api_key_path=key_api)

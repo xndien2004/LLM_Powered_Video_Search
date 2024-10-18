@@ -5,19 +5,18 @@ import numpy as np
 import scipy
 import pickle
 import json
-import re
-from utils import combine_search
+import re 
 from AIC.settings import MEDIA_ROOT
 from utils.combine_search import maximal_marginal_relevance
 
-class ocr_retrieval():
-    def __init__(self, id2img_fps, pkl_ocr_path, npz_ocr_path):
-        tfids_ocr_path = MEDIA_ROOT+'/contexts_bin/'
+class ASRRetrieval():
+    def __init__(self, id2img_fps, pkl_asr_path, npz_asr_path):
+        tfids_asr_path = MEDIA_ROOT+'/contexts_bin/'
         self.tfidf_transform = None
         self.context_matrix = None
-        with open(tfids_ocr_path + pkl_ocr_path, 'rb') as f:
+        with open(tfids_asr_path + pkl_asr_path, 'rb') as f:
             self.tfidf_transform = pickle.load(f)
-        self.context_matrix = scipy.sparse.load_npz(tfids_ocr_path + npz_ocr_path)
+        self.context_matrix = scipy.sparse.load_npz(tfids_asr_path + npz_asr_path)
     
         self.id2img_fps = id2img_fps
     
@@ -42,13 +41,12 @@ class ocr_retrieval():
     
     def __call__(self, texts, is_mmr=False, lambda_param=0.5, k=100, index=None,):
         k = k*2 if is_mmr else k
-        scores, idx_image_ = self.find_similar_score(texts, k, index=index)
+        scores, idx_image_ = self.find_similar_score(texts, k=k, index=index)
         if is_mmr:
             print("use MMR")
             selected_indices = maximal_marginal_relevance(texts, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)
             idx_image_ = np.array(idx_image_)[selected_indices]
             scores = scores[selected_indices]
-            
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
         image_paths = [info['image_path'] for info in infos_query]
         frame_idx = [info['pts_time'] for info in infos_query]
@@ -71,4 +69,10 @@ class ocr_retrieval():
             scores = scores[sort_index]
             sort_index = np.array(index)[sort_index]
         return scores, sort_index
+
+
+if __name__ == "__main__":
+    query = "Xin chao"
+    asr = asr_retrieval()
+    print(asr(query, k=5))
 
