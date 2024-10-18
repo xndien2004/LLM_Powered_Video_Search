@@ -18,8 +18,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
-    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
@@ -450,7 +448,8 @@
     <script src="{% static 'js/others.js' %}"></script>
     <script src="{% static 'js/jquery_colect.js' %}"></script>
     <script> 
-    const API_URL = "";
+    // const API_URL = "https://8000--main--nghiavd--nghiasun-coder.trylai.top";
+    const API_URL = '';
 
     // info susscess
     function infoSusscess(text) {
@@ -523,7 +522,7 @@
     }
 
     function fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE) {
-        fetch(`${API_URL}/api/cluster_frames/`, {
+        fetch(`/api/cluster_frames/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -575,7 +574,8 @@
                 // update video 
                 const videoContent = navRight.querySelector('.right-video-container iframe');
                 const videoIdYoutube = getYoutubeVideoId(video_info.watch_url);
-                const start = Math.floor(ID_IMAGE / start_time);
+                // const start = Math.floor(ID_IMAGE / start_time);
+                const start = Math.floor(ID_IMAGE/1000);
                 videoContent.src = `https://youtube.com/embed/${videoIdYoutube}?start=${start}`;
             }
         })

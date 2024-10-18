@@ -70,7 +70,7 @@ key_api = "D:/Wordspace/Python/paper_competition/key_gpt.txt"
 keyword = "./keyword.txt"
 
 # load file
-is_extra = "both" # ["no", "yes", "both"]
+is_extra = "1" # ["no", "yes", "both"]
 is_openclip = False # SigLIP
 is_evalip = False # dfn5b
 is_object = False
@@ -78,7 +78,7 @@ if is_extra == "no":
     cosine_faiss = faiss_search.FaissSearch(dict_path, is_openclip, is_object, is_evalip)
 elif is_extra == "yes":
     cosine_faiss_extra = faiss_search.FaissSearch(dict_path_extra, is_openclip, is_object, is_evalip)
-else:
+elif is_extra == "both":
     cosine_faiss = faiss_search.FaissSearch(dict_path, is_openclip, is_object, is_evalip)
     cosine_faiss_extra = faiss_search.FaissSearch(dict_path_extra, is_openclip, is_object, is_evalip)
 
@@ -132,8 +132,6 @@ class TextSearchImage(APIView):
         options = request.data.get('options')
         is_mmr = request.data.get('is_mmr')
         lambda_param = float(request.data.get('lambda_param')) if is_mmr == True else 1
-        print("lambda_param: ", lambda_param)
-        print("is_mmr: ", is_mmr) if is_mmr == True else 1
         print("lambda_param: ", lambda_param)
         print("is_mmr: ", is_mmr)
         print("options: ", options)
