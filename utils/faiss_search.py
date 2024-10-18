@@ -14,18 +14,21 @@ from .caption_retrieval.caption_retrieval import caption_retrieval
 from .ocr_retrieval.ocr_retrieval import ocr_retrieval
 from .asr_retrieval.asr_retrieval import asr_retrieval
 from .tag_retrieval.tag_retrieval import tag_retrieval
+from .media_info_retrieval.media_info_retrieval import media_info_retrieval
 from .combine_search import maximal_marginal_relevance
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 class FaissSearch:
     def __init__(self, dict_path: dict, is_openclip=False, is_object=False, is_evalip=False):     
-        self.id2img_fps = self.load_json_file(dict_path['id2img_fps_json_path']) 
+        self.id2img_fps = self.load_json_file(dict_path['id2img_fps_json_path'])   
+        self.id2video = self.load_json_file(dict_path['id2video_json_path']) 
         self.map_asr = self.load_json_file(dict_path['map_asr_json_path'])
         self.caption_retrieval = caption_retrieval(self.id2img_fps, dict_path['pkl_caption_path'], dict_path['npz_caption_path'])
         self.ocr_retrieval = ocr_retrieval(self.id2img_fps, dict_path['dict_pkl_ocr_path'], dict_path['dict_npz_ocr_path'])
         self.asr_retrieval = asr_retrieval(self.map_asr, dict_path['dict_pkl_asr_path'], dict_path['dict_npz_asr_path'])
         self.tag_retrieval = tag_retrieval(self.id2img_fps, dict_path['dict_pkl_tag_path'], dict_path['dict_npz_tag_path'])
+        self.media_info_retrieval = media_info_retrieval(self.id2video, dict_path['dict_npz_media_info_path'], dict_path['dict_npz_media_info_path'])
         self.__device = "cuda" if torch.cuda.is_available() else "cpu" 
         
         self.is_openclip = is_openclip
@@ -193,7 +196,7 @@ class FaissSearch:
         }
         ''' 
         if object_input is not None:
-            scores, idx_image, frame_idx, image_paths = self.object_retrieval(object_input, is_mmr=False, lambda_param=0.5, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.object_retrieval(object_input, is_mmr=is_mmr, lambda_param=lambda_param, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     
     def caption_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None, is_translate=True):
@@ -204,7 +207,7 @@ class FaissSearch:
         if is_translate:
             texts = str(translate_lib(texts, to_lang='en'))
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.caption_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.caption_retrieval(texts, is_mmr=is_mmr, lambda_param=lambda_param, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     
     def ocr_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None):
@@ -213,7 +216,7 @@ class FaissSearch:
         texts = "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện."
         '''
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.ocr_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.ocr_retrieval(texts, is_mmr=is_mmr, lambda_param=lambda_param, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
 
     def asr_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None):
@@ -222,7 +225,7 @@ class FaissSearch:
         texts = "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện."
         '''
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.asr_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.asr_retrieval(texts, is_mmr=is_mmr, lambda_param=lambda_param, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
     
     def tag_search(self, texts, is_mmr=False, lambda_param=0.5, k=5, index=None):
@@ -231,8 +234,19 @@ class FaissSearch:
         texts = "building sky tree"
         '''
         if texts != '':
-            scores, idx_image, frame_idx, image_paths = self.tag_retrieval(texts, is_mmr=False, lambda_param=0.5, k=k, index=index)
+            scores, idx_image, frame_idx, image_paths = self.tag_retrieval(texts, is_mmr=is_mmr, lambda_param=lambda_param, k=k, index=index)
         return scores, idx_image, frame_idx, image_paths
+        
+    def media_info_search(self, texts, k=5, index=None):
+        '''
+        Example:
+        texts = {
+            'description': "Hình ảnh là cảnh trong bản tin HTV7 HD. Người dẫn chương trình mặc áo xanh và cà vạt chấm bi, đứng trước nền thành phố lúc hoàng hôn. Dưới cùng có dải chữ chạy thông tin sự kiện.",
+            'title': "Bản tin HTV7 HD"
+        }
+        '''
+        scores, idx_video, watch_urls, video_paths = self.media_info_retrieval(texts, k=k, index=index, sources="video")
+        return scores, idx_video, watch_urls, video_paths
     def feelback(self, previous_results, positive_feedback_idxs, negative_feedback_idxs):
         
         feedback_idxs = np.array(positive_feedback_idxs + negative_feedback_idxs, dtype='int64')
@@ -271,7 +285,7 @@ class FaissSearch:
         feelbacked_scores = [score for _, score in feelbacked_results]
 
         video_info_list = [self.id2img_fps.get(video_id) for video_id in feelbacked_ids]
-        feelbacked_framesID = [info['frame_idx'] for info in video_info_list if info is not None]
+        feelbacked_framesID = [info['pts_time'] for info in video_info_list if info is not None]
         image_paths = [info['image_path'] for info in video_info_list if info is not None]
 
         return feelbacked_scores, feelbacked_ids, feelbacked_framesID, image_paths

@@ -42,6 +42,15 @@
 }
 
 /* feelback and rerank and llm */
+.menu-options{
+    width: 60px;
+    border-radius: 5px;
+    border: 1px solid #d1d1d1;
+    outline: none;
+    padding: 5px;
+    font-size: 12px;
+}
+
 .lambda_param{
     width: 30px;
     border-radius: 5px;
@@ -50,6 +59,7 @@
     padding: 5px;
     font-size: 12px;
 }
+.menu-options:focus,
 .lambda_param:focus {
     border-color: #007bff;
 }

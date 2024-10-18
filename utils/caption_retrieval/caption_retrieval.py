@@ -13,7 +13,6 @@ from utils.combine_search import maximal_marginal_relevance
 class caption_retrieval():
     def __init__(self, id2img_fps, pkl_caption_path, npz_caption_path):
         tfids_caption_path = MEDIA_ROOT+'/contexts_bin/'
-        self.all_datatype = ['caption']
         self.tfidf_transform = None
         self.context_matrix = None
         with open(tfids_caption_path + pkl_caption_path, 'rb') as f:
@@ -51,7 +50,7 @@ class caption_retrieval():
             scores = scores[selected_indices]
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
         image_paths = [info['image_path'] for info in infos_query]
-        frame_idx = [info['frame_idx'] for info in infos_query]
+        frame_idx = [info['pts_time'] for info in infos_query]
         return scores, idx_image_, frame_idx, image_paths
     
     def find_similar_score(

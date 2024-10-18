@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Retrieval-FU</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navLeft.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navRight.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
+    <!-- Google Fonts Link For Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-name">Faster United</div>
+            <div class="advanced-container">
+                <p>Video Retrieval</p>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search">
+                <div class="search-box-header">
+                    <input class="number-search" placeholder="Number search..." value="100" style="border-right: 1px solid #ddd;">
+                    <textarea class="text-search" id="text-search" placeholder="Search text query..." rows="1" cols="50"></textarea>
+                    <button class="btn-text-search" title="Search text query">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="actions" style="display: none;">
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="title" class="menu-choice">
+                        <div class="menu-name">Title</div>
+                    </div>
+                    <div class="menu-frames-container">
+                        <input type="checkbox" id="description" class="menu-choice">
+                        <div class="menu-name">Description</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <main>
+            <!-- loader -->
+            <div class="loader" style="display: none;"></div>
+            <!-- Image grid -->
+            <div class="image-grid" id="imageContent">
+                <!-- list video -->
+                <!-- <button class="id-video">ID video</button> -->
+            </div>
+        </main>
+        <!-- navright -->
+        <nav id="navRight" class="nav-right" style="display: block;">
+            <!-- Navigation content -->
+            <div class="right-container">
+                <div class="right-header">
+                    <div class="header-title">
+                        <div class="right-id-video">ID video</div>
+                    </div>
+                    <!-- close nav-right -->
+                    <div class="close-nav-right">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M8 7.121L2.879 2 1.465 3.414 6.586 8 1.465 12.586 2.879 14 8 9.879l5.121 4.121 1.414-1.414L9.414 8 14.536 2.879 13.121 1.465z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="right-main">
+                    <div class="right-image">
+                        <div class="right-video-container" style="display: block;">
+                            <iframe src="https://youtube.com/embed/HNsRpkryGXA?start=1004" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </nav>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- <script src="{% static 'js/others.js' %}"></script> -->
+    <script src="{% static 'js/jquery_colect.js' %}"></script>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        const textSearch = document.getElementById('text-search');
+        const numberSearch = document.querySelector('.number-search');
+        const btnTextSearch = document.querySelector('.btn-text-search');
+        const imageContent = document.getElementById('imageContent');
+        const titleCheckbox = document.getElementById('title');
+        const descriptionCheckbox = document.getElementById('description');
+        const loader = document.querySelector('.loader');
+     
+        btnTextSearch.addEventListener('click', function() {
+            const text = textSearch.value;
+            const number = numberSearch.value;
+            const title = titleCheckbox.checked ? 'title' : '';
+            const description = descriptionCheckbox.checked ? 'description' : '';
+            loader.style.display = 'block';
+
+            fetch(`/api/media_info_search/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({ title, description, text, number }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                imageContent.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('button');
+                    div.classList.add('id-video');
+                    div.textContent = item.video_name;
+                    imageContent.appendChild(div);
+                });
+                loader.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

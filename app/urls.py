@@ -5,6 +5,7 @@ from . import viewAPI
 # The path() function is passed four arguments, two of which are optional: route, view, kwargs, and name.
 urlpatterns = [ 
     path('', views.index, name='index'),
+    path('video/', views.video, name='video'),
 
     # API
     # load objects
@@ -16,6 +17,7 @@ urlpatterns = [
     path('api/image_query/', viewAPI.ImageQuery.as_view(), name='image_query'),
     path('api/filter_search/', viewAPI.FilterSearch.as_view(), name='filter_search'),
     path('api/tag_query/', viewAPI.TagQuery.as_view(), name='tag_query'),
+    path('api/media_info_search/', viewAPI.MediaInfoVideo.as_view(), name='media_info_search'),
 
     # cluster
     path('api/cluster_frames/', viewAPI.ClusterFrames.as_view(), name='cluster_frames'),
@@ -26,5 +28,6 @@ urlpatterns = [
 
     # LLM
     path('api/llm/', viewAPI.LLM.as_view(), name='llm'),
+    
     path('api/llm_chatbot/', viewAPI.LLMChatbot.as_view(), name='llm_chatbot'),
 ]

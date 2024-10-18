@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import pandas as pd
 from utils import faiss_search,langchain_search, combine_search
+from utils.media_info_retrieval import media_info_retrieval
 from utils.LLM import llm_retrieval, llm
 from .data_utils import *
 from AIC.settings import MEDIA_ROOT, STATICFILES_DIRS
@@ -22,6 +23,15 @@ dict_path = {
     'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_DFN5B.bin', # dfn5b
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps.json',
     'map_asr_json_path': MEDIA_ROOT + '/map-asr.json',
+    'id2video_json_path': MEDIA_ROOT + '/id2video.json',
+    "dict_pkl_media_info_path": {
+        'description': '/pkl/tfidf_transform_description.pkl',
+        'title': '/npz/sparse_context_matrix_title.npz',
+    },
+    'dict_npz_media_info_path': {
+        'description': '/npz/sparse_context_matrix_description.npz',
+        'title': '/pkl/tfidf_transform_title.pkl',
+    },
     'dict_pkl_object_path': {
         'number': '/pkl/tfidf_transform_number.pkl',
         'number_tag': '/pkl/tfidf_transform_number_tag.pkl',
@@ -66,11 +76,12 @@ dict_path_extra = {
     'dict_pkl_tag_path': '/pkl_extra/tfidf_transform_tag.pkl',
     'dict_npz_tag_path': '/npz_extra/sparse_context_matrix_tag.npz'
 }
+
 key_api = "D:/Wordspace/Python/paper_competition/key_gpt.txt"
 keyword = "./keyword.txt"
 
 # load file
-is_extra = "1" # ["no", "yes", "both"]
+is_extra = "no" # ["no", "yes", "both"]
 is_openclip = False # SigLIP
 is_evalip = False # dfn5b
 is_object = False
@@ -502,3 +513,24 @@ class LLMChatbot(APIView):
         return Response({"reply": reply,
                          "frame_idxs":frame_idxs,
                          "image_paths":image_paths}, status=status.HTTP_200_OK)
+    
+
+# video info
+class MediaInfoVideo(APIView):
+    def post(self, request):
+        query = str(request.data.get('text')).lower()
+        number = int(request.data.get('number'))
+        title = request.data.get('title')
+        description = request.data.get('description')
+        query_dict = {}
+        if title == "title":
+            query_dict["title"] = query
+        else:
+            query_dict["title"] = ''
+        if description == "description":
+            query_dict["description"] = query
+        else:
+            query_dict["description"] = ''
+        scores, idx_video, watch_urls, video_name = cosine_faiss.media_info_search(query_dict, k=number, sources="video")
+        return Response({"scores": scores, "idx_video":idx_video,
+                         "watch_urls":watch_urls, "video_name":video_name}, status=status.HTTP_200_OK)

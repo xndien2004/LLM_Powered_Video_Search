@@ -68,38 +68,9 @@
                     </div>
                 </div>                              
                 <div class="actions" style="display: none;"> 
-                    <select id="options">
-                        <option value="All">All</option>
-                        <option value="L01">L01</option>
-                        <option value="L02">L02</option>
-                        <option value="L03">L03</option>
-                        <option value="L04">L04</option>
-                        <option value="L05">L05</option>
-                        <option value="L06">L06</option>
-                        <option value="L07">L07</option>
-                        <option value="L08">L08</option>
-                        <option value="L09">L09</option>
-                        <option value="L10">L10</option>
-                        <option value="L11">L11</option>
-                        <option value="L12">L12</option>
-                        <option value="L13">L13</option>
-                        <option value="L14">L14</option>
-                        <option value="L15">L15</option>
-                        <option value="L16">L16</option>
-                        <option value="L17">L17</option>
-                        <option value="L18">L18</option>
-                        <option value="L19">L19</option>
-                        <option value="L20">L20</option>
-                        <option value="L21">L21</option>
-                        <option value="L22">L22</option>
-                        <option value="L23">L23</option>
-                        <option value="L24">L24</option>
-                        <option value="L25">L26</option>
-                        <option value="L27">L27</option>
-                        <option value="L28">L28</option>
-                        <option value="L29">L29</option>
-                        <option value="L30">L30</option> 
-                    </select>
+                    <div class="menu-frames-container">
+                        <input id="options" class="menu-options" value="All" placeholder="select video or folder video">
+                    </div>
                     <div class="menu-frames-container">
                         <input type="checkbox" id="asr" class="menu-choice">
                         <div class="menu-name">ASR</div>
@@ -786,18 +757,8 @@
 
     // MMR
     lambdaParam.addEventListener('change', function() {
-        if (lambdaParam.value) {
-            mmr = true;
-        } else {
-            mmr = false;
-        }
+        mmr = lambdaParam.value ? true : false;
     });
-
-    if (lambdaParam.value){
-        const mmr = true;
-    } else {
-        const mmr = false;
-    }
     const choiceDict = {};
     choiceQuery.forEach(choice => {
         choiceDict[choice.id] = choice.checked ? 1 : 0;

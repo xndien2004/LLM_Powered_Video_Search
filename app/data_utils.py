@@ -80,7 +80,7 @@ def get_index_image(json_data, keyframe):
     index_keyframe = []
     for key, value in json_data.items():
         image_path = value["image_path"]
-        if f'Keyframes_{keyframe}' in image_path:
+        if keyframe in image_path:
             index_keyframe.append(int(key))
 
     return index_keyframe

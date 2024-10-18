@@ -13,7 +13,6 @@ from utils.combine_search import maximal_marginal_relevance
 class tag_retrieval():
     def __init__(self, id2img_fps, pkl_tag_path, npz_tag_path):
         tfids_tag_path = MEDIA_ROOT+'/contexts_bin/'
-        self.all_datatype = ['tag']
         self.tfidf_transform = None
         self.context_matrix = None
         with open(tfids_tag_path + pkl_tag_path, 'rb') as f:
@@ -51,7 +50,7 @@ class tag_retrieval():
             scores = scores[selected_indices]
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
         image_paths = [info['image_path'] for info in infos_query]
-        frame_idx = [info['frame_idx'] for info in infos_query]
+        frame_idx = [info['pts_time'] for info in infos_query]
         return scores, idx_image_, frame_idx, image_paths
     
     def find_similar_score(

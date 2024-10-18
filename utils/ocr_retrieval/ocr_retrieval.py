@@ -13,7 +13,6 @@ from utils.combine_search import maximal_marginal_relevance
 class ocr_retrieval():
     def __init__(self, id2img_fps, pkl_ocr_path, npz_ocr_path):
         tfids_ocr_path = MEDIA_ROOT+'/contexts_bin/'
-        self.all_datatype = ['ocr']
         self.tfidf_transform = None
         self.context_matrix = None
         with open(tfids_ocr_path + pkl_ocr_path, 'rb') as f:
@@ -52,7 +51,7 @@ class ocr_retrieval():
             
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
         image_paths = [info['image_path'] for info in infos_query]
-        frame_idx = [info['frame_idx'] for info in infos_query]
+        frame_idx = [info['pts_time'] for info in infos_query]
         return scores, idx_image_, frame_idx, image_paths
     
     def find_similar_score(
