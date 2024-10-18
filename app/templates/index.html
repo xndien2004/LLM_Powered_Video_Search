@@ -469,7 +469,7 @@
                 "showEasing": "swing",
                 "hideEasing": "linear",
                 "showMethod": "fadeIn",
-                "hideMethod": "hide"
+                "hideMethod": "fadeOut"
             }
 
             toastr.success(text);
@@ -493,7 +493,7 @@
                 "showEasing": "swing",
                 "hideEasing": "linear",
                 "showMethod": "fadeIn",
-                "hideMethod": "hide"
+                "hideMethod": "fadeOut"
             }
 
             toastr.error(text);
@@ -919,31 +919,12 @@
     btnSendServer.addEventListener('click', function() {
         let sessionId = '';
         if (nameVideo.value && ptsTime.value) {
-            fetch(`https://eventretrieval.one/api/v2/login`, {
-                method: 'POST',
+            fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${sessionId}`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({username: 'team26', password: 'sU3DVCbCWs'}),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Login failed! Status: ${response.status}`);
+                    // 'Authorization': `Bearer ${sessionId}`
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log("sessionId: ", data.sessionId);
-                sessionId = data.sessionId;
-                
-                return fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${sessionId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': `Bearer ${sessionId}`
-                    }
-                });
             })
             .then(response => {
                 if (!response.ok) {

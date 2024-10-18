@@ -270,7 +270,16 @@ button {
 
 /* info */
 #toast-container {
-    top: 100px !important; 
-    opacity: 0.8 !important;
-    /* right: 20px !important;  */
+    top: 80px !important; 
+    /* opacity: 0.8 !important; */
+    z-index: 9999999999999999999999999999999999;
+    
+}
+#toast-container .toast-success{
+    background-color: #01c943;
+    color: white;
+}
+#toast-container .toast-error{
+    background-color: red;
+    color: white;
 }
