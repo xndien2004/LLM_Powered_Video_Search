@@ -24,13 +24,14 @@
         <div class="logo">
             <div class="logo-name">Faster United</div>
             <div class="advanced-container">
-                <p>Video Retrieval</p>
+                <p style="white-space: nowrap;">Video Retrieval</p>
+                <button id="copy-id-video">Copy</button>
             </div>
         </div>
         <div class="search-container">
             <div class="search">
                 <div class="search-box-header">
-                    <input class="number-search" placeholder="Number search..." value="100" style="border-right: 1px solid #ddd;">
+                    <input class="number-search" placeholder="Number search..." value="50" style="border-right: 1px solid #ddd;">
                     <textarea class="text-search" id="text-search" placeholder="Search text query..." rows="1" cols="50"></textarea>
                     <button class="btn-text-search" title="Search text query">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -93,6 +94,54 @@
     <!-- <script src="{% static 'js/others.js' %}"></script> -->
     <script src="{% static 'js/jquery_colect.js' %}"></script>
     <script>
+        // info susscess
+        function infoSusscess(text) {
+            $(document).ready(function() {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-right",
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "1500",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
+
+                toastr.success(text);
+            });
+        }
+        // info error
+        function infoError(text) {
+            $(document).ready(function() {
+                toastr.options = {
+                    "closeButton": true,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-right",
+                    "preventDuplicates": true,
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "1500",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
+
+                toastr.error(text);
+            });
+        }
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -122,15 +171,20 @@
         const descriptionCheckbox = document.getElementById('description');
         const loader = document.querySelector('.loader');
         const closeNavRight = document.querySelector('.close-nav-right');
+        const copyIdVideo = document.getElementById('copy-id-video');
      
         btnTextSearch.addEventListener('click', function() {
+            if (textSearch.value === '') {
+                infoError('Please enter text query!');
+                return;
+            }
             const text = textSearch.value;
             const number = numberSearch.value;
             const title = titleCheckbox.checked ? 'title' : '';
             const description = descriptionCheckbox.checked ? 'description' : '';
             loader.style.display = 'block';
 
-            fetch(`/api/media_info_search/`, {
+            fetch(`https://8000--main--nghiavd--nghiasun-coder.trylai.top/api/media_info_search/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -187,6 +241,19 @@
         // close nav-right
         closeNavRight.addEventListener('click', function() {
             document.getElementById('navRight').style.display = 'none';
+        });
+
+        // copy id video
+        copyIdVideo.addEventListener('click', function() {
+            const listID = document.querySelectorAll('.id-video');  
+            const id = Array.from(listID).map(item => item.textContent).join(',');
+            navigator.clipboard.writeText(id); 
+            copyIdVideo.style.backgroundColor = '#4CAF50';
+            copyIdVideo.textContent = 'Copied';
+            setTimeout(() => {
+                copyIdVideo.style.backgroundColor = '#555';
+                copyIdVideo.textContent = 'Copy';
+            }, 3000);
         });
     </script>
 </body>

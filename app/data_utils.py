@@ -77,10 +77,6 @@ def run_search(choice_key, search_func, source, choice_dict, text, is_mmr, lambd
         search_by_type(choice_key.upper(), search_func, source=source, text=text, is_mmr=is_mmr, lambda_param=lambda_param, index=index, k=k, list_results=list_results)
 
 def get_index_image(json_data, keyframe):
-    index_keyframe = []
-    for key, value in json_data.items():
-        image_path = value["image_path"]
-        if keyframe in image_path:
-            index_keyframe.append(int(key))
-
-    return index_keyframe
+    keyframes = keyframe.split(",") if isinstance(keyframe, str) and "," in keyframe else [keyframe]
+    return [int(key) for key, value in json_data.items() 
+            for kf in keyframes if kf in value["image_path"]]
