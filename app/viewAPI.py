@@ -77,7 +77,7 @@ dict_path_extra = {
     'dict_npz_tag_path': '/npz_extra/sparse_context_matrix_tag.npz'
 }
 
-key_api = "utils/key_gpt.txt"
+key_api = r"D:\Wordspace\Python\paper_competition\key_gpt.txt"
 keyword = "utils/keyword.txt"
 
 # load file

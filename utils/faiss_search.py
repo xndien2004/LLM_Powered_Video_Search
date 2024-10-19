@@ -26,7 +26,7 @@ class FaissSearch:
         
         self.is_openclip = is_openclip
         if is_object:
-            self.object_retrieval = object_retrieval(self.id2img_fps, dict_path['dict_pkl_object_path'], dict_path['dict_npz_object_path'])
+            self.object_retrieval = object_retrieval.ObjectRetrieval(self.id2img_fps, dict_path['dict_pkl_object_path'], dict_path['dict_npz_object_path'])
         if is_openclip:
             self.index_open_clip = self.load_bin_file(dict_path['faiss_openclip_bin_path'])
             self.open_clip_model, _, self.openclip_preprocess = open_clip.create_model_and_transforms('ViT-SO400M-14-SigLIP-384', device=self.__device, pretrained='webli')
