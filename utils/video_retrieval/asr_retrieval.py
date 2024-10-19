@@ -44,7 +44,8 @@ class ASRRetrieval():
         scores, idx_image_ = self.find_similar_score(texts, k=k, index=index)
         if is_mmr:
             print("use MMR")
-            selected_indices = maximal_marginal_relevance(texts, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)
+            input_vector = self.transform_input(texts)
+            selected_indices = maximal_marginal_relevance(input_vector, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)            
             idx_image_ = np.array(idx_image_)[selected_indices]
             scores = scores[selected_indices]
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))

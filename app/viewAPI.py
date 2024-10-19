@@ -81,7 +81,7 @@ key_api = r"D:\Wordspace\Python\paper_competition\key_gpt.txt"
 keyword = "utils/keyword.txt"
 
 # load file
-is_extra = "1" # ["no", "yes", "both"]
+is_extra = "no" # ["no", "yes", "both"]
 is_openclip = False # SigLIP
 is_evalip = False # dfn5b
 is_object = False

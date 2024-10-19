@@ -45,7 +45,11 @@ class TagRetrieval():
         scores, idx_image_ = self.find_similar_score(texts, k, index=index)
         if is_mmr:
             print("use MMR")
-            selected_indices = maximal_marginal_relevance(texts, self.context_matrix[idx_image_,:], lambda_param=lambda_param, top_k=k)
+            input_vector = self.transform_input(texts)
+            query_dense = input_vector.toarray() if isinstance(input_vector, scipy.sparse.csr_matrix) else input_vector
+            context_dense = self.context_matrix[idx_image_, :].toarray() if isinstance(self.context_matrix[idx_image_, :], scipy.sparse.csr_matrix) else self.context_matrix[idx_image_, :]
+            print(type(query_dense))
+            selected_indices = maximal_marginal_relevance(query_dense.reshape(1, -1), context_dense, lambda_param=lambda_param, top_k=k)
             idx_image_ = np.array(idx_image_)[selected_indices]
             scores = scores[selected_indices]
         infos_query = list(map(self.id2img_fps.get, list(idx_image_)))

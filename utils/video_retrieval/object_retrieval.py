@@ -49,7 +49,8 @@ class ObjectRetrieval():
                 k = k*2 if is_mmr else k
                 scores_, idx_image_ = self.find_similar_score(texts[input_type], input_type, k, index=index)
                 if is_mmr:
-                    selected_indices = maximal_marginal_relevance(texts[input_type], self.context_matrix[input_type][idx_image_,:], lambda_param=lambda_param, top_k=k)
+                    input_vector = self.transform_input(texts[input_type], input_type)
+                    selected_indices = maximal_marginal_relevance(input_vector, self.context_matrix[input_type][idx_image_,:], lambda_param=lambda_param, top_k=k)
                     idx_image_ = np.array(idx_image_)[selected_indices]
                     scores_ = scores_[selected_indices]
                 infos_query = list(map(self.id2img_fps.get, list(idx_image_)))
@@ -58,12 +59,6 @@ class ObjectRetrieval():
                 list_results.append((scores_, idx_image_, frame_idx, image_paths, list(range(1,len(frame_idx)+1)),[sources]*len(frame_idx)))
         
         scores, idx_image, frame_idx, image_paths,_ = combine_search.combined_ranking_score(list_results, alpha=0.5, beta=0.5)
-        
-        # scores, idx_image = combine_search.merge_searching_results_by_addition(scores, idx_image)
-
-        # infos_query = list(map(self.id2img_fps.get, list(idx_image)))
-        # image_paths = [info['image_path'] for info in infos_query]
-        # frame_idx = [info['frame_idx'] for info in infos_query]
         return scores, idx_image, frame_idx, image_paths  
 
 

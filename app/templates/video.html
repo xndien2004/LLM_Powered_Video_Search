@@ -184,7 +184,7 @@
             const description = descriptionCheckbox.checked ? 'description' : '';
             loader.style.display = 'block';
 
-            fetch(`https://8000--main--nghiavd--nghiasun-coder.trylai.top/api/media_info_search/`, {
+            fetch(`/api/media_info_search/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
