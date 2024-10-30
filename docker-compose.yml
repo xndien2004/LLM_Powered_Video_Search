@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: ./code
+      dockerfile: Dockerfile
+    command: bash -c "chmod +x ./entrypoint.sh && ./entrypoint.sh"
+    volumes:
+      - ./code:/code
+    
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=$CF_TUNNEL_TOKEN
+      

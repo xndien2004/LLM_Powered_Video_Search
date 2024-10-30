@@ -29,8 +29,10 @@ class FaissSearch:
             self.object_retrieval = object_retrieval.ObjectRetrieval(self.id2img_fps, dict_path['dict_pkl_object_path'], dict_path['dict_npz_object_path'])
         if is_openclip:
             self.index_open_clip = self.load_bin_file(dict_path['faiss_openclip_bin_path'])
-            self.open_clip_model, _, self.openclip_preprocess = open_clip.create_model_and_transforms('ViT-SO400M-14-SigLIP-384', device=self.__device, pretrained='webli')
-            self.open_clip_tokenizer = open_clip.get_tokenizer('ViT-SO400M-14-SigLIP-384')
+            # self.open_clip_model, _, self.openclip_preprocess = open_clip.create_model_and_transforms('ViT-SO400M-14-SigLIP-384', device=self.__device, pretrained='webli')
+            # self.open_clip_tokenizer = open_clip.get_tokenizer('ViT-SO400M-14-SigLIP-384')
+            self.open_clip_model, _, self.openclip_preprocess = open_clip.create_model_and_transforms('ViT-L-14', device=self.__device, pretrained='datacomp_xl_s13b_b90k')
+            self.open_clip_tokenizer = open_clip.get_tokenizer('ViT-L-14')
         if is_evalip:
             self.index_evalip = self.load_bin_file(dict_path['faiss_evalip_bin_path'])
             self.evalip_model, _, self.evalip_preprocess = open_clip.create_model_and_transforms('ViT-H-14-378-quickgelu', device=self.__device, pretrained='dfn5b')

@@ -19,7 +19,7 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 # features preparing
 tag_corpus_path = MEDIA_ROOT + '/tag/tag_corpus.txt'
 dict_path = {
-    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_SigLIP384.bin', # SigLIP
+    'faiss_openclip_bin_path': MEDIA_ROOT + '/faiss/faiss_openclip.bin', # SigLIP
     'faiss_evalip_bin_path': MEDIA_ROOT + '/faiss/faiss_DFN5B.bin', # dfn5b
     'id2img_fps_json_path': MEDIA_ROOT + '/id2img_fps.json',
     'map_asr_json_path': MEDIA_ROOT + '/map-asr.json',
@@ -77,12 +77,12 @@ dict_path_extra = {
     'dict_npz_tag_path': '/npz_extra/sparse_context_matrix_tag.npz'
 }
 
-key_api = r"D:\Wordspace\Python\paper_competition\key_gpt.txt"
+key_api = "./key_gpt.txt"
 keyword = "utils/keyword.txt"
 
 # load file
 is_extra = "no" # ["no", "yes", "both"]
-is_openclip = False # SigLIP
+is_openclip = True # SigLIP
 is_evalip = False # dfn5b
 is_object = False
 if is_extra == "no":

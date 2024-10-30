@@ -3,6 +3,7 @@ import sys
 import copy
 import ast
 import base64
+import requests
 import io
 from PIL import Image
 from AIC.settings import MEDIA_ROOT
@@ -23,7 +24,7 @@ def get_llm(key_api, model, temperature, history, search, text_path):
         return OpenAiLlm(key_api=key_api, model=model, temperature=temperature, history=history, search=search, text_path=text_path,
                          image=True)
     elif model == 'dall-e-3':
-        return DALLE(model=model, temperature=temperature)
+        return DALLE(key_api=key_api,model=model, temperature=temperature)
 
 class OpenAiLlm:
     def __init__(self, key_api, model, temperature, history, search, text_path, image):
@@ -186,8 +187,8 @@ class OpenAiLlm:
 
     
     def search_image(self, content, number):
-        list_search = self.type_search(content)
-        list_search = [x.lower() for x in list_search]
+        # list_search = self.type_search(content)
+        list_search = "openclip"#[x.lower() for x in list_search]
         results = []
         if "ocr" in list_search:
             scores, idx_image, frame_idxs, image_paths = self.search.ocr_search(content, k=number, index=None)
@@ -209,11 +210,13 @@ class OpenAiLlm:
 
 
 class DALLE:
-    def __init__(self, model, temperature):
+    def __init__(self, key_api, model, temperature):
         super(DALLE, self).__init__()
         self.model = model
+        with open(key_api, 'r') as file:
+            key_api = file.read().replace('\n', '')
+        self.client = OpenAI(api_key=key_api)
         self.temperature = temperature
-        self.client = OpenAI()
 
     def generate_answer(self, content):
         response = self.client.images.generate(
@@ -224,6 +227,9 @@ class DALLE:
             n=1,
         )
         image_url = response.data[0].url
+        image_data = requests.get(image_url).content
+        with open('D:/Wordspace/Python/paper_competition/AI_Challenge/media/generated_image.png', 'wb') as f:
+            f.write(image_data)
         completion = self.client.chat.completions.create(
             model='gpt-4-turbo',
             temperature=self.temperature,
@@ -255,11 +261,13 @@ class DALLE:
         )
         reply = completion.choices[0].message.content
         return {
-            'images': [
-                {
-                    'id': image_url,
-                }
-            ],
+            'frame_idxs': [""],
+            'image_paths': ["/generated_image.png"],
+            # 'images': [
+            #     {
+            #         'id': image_url,
+            #     }
+            # ],
             'reply': reply
         }
     

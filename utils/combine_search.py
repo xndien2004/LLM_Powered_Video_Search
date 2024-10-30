@@ -5,15 +5,22 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def merge_searching_results(list_scores, list_indices, list_image_paths):
     '''
-    Arg:
-      list_scores: List[np.array]
-      list_indices: List[np.array]
+    Merges and normalizes the scores from multiple search results, sorts them in descending order, 
+    and returns unique scores and indices based on image paths.
+    
+    Args:
+        list_scores (List[np.array]): List of score arrays.
+        list_indices (List[np.array]): List of index arrays.
+        list_image_paths (List[list]): List of image path lists.
+        
+    Returns:
+        Tuple[np.array, np.array, np.array]: Arrays of unique normalized scores, indices, and image paths.
     '''
     normalized_list_scores = []
     list_image_paths_refined = []
     for score, image_path in zip(list_scores, list_image_paths):
-      normalized_list_scores.append(score/np.linalg.norm(score))
-      list_image_paths_refined.extend(image_path)
+        normalized_list_scores.append(score/np.linalg.norm(score))
+        list_image_paths_refined.extend(image_path)
 
     normalized_list_scores = np.concatenate(normalized_list_scores)
     list_indices_refined = np.concatenate(list_indices)
@@ -30,32 +37,36 @@ def merge_searching_results(list_scores, list_indices, list_image_paths):
 
 def merge_searching_results_by_addition(list_scores, list_indices):
     '''
-    Arg:
-      list_scores: List[np.array]
-      list_indices: List[np.array]
-    '''
-
-    if len(list_scores) == 1:
-      return list_scores[0], list_indices[0]
+    Merges search results by normalizing scores and summing up duplicate scores 
+    for unique indices.
     
-    # Normalize score
+    Args:
+        list_scores (List[np.array]): List of score arrays.
+        list_indices (List[np.array]): List of index arrays.
+        
+    Returns:
+        Tuple[np.array, np.array]: Arrays of aggregated scores and unique indices, sorted by score in descending order.
+    '''
+    if len(list_scores) == 1:
+        return list_scores[0], list_indices[0]
+    
     new_list_scores = []
     for scores in list_scores:
-      new_scores = (scores-np.min(scores))/(np.max(scores)-np.min(scores)+0.000001)
-      new_list_scores.append(new_scores)
+        new_scores = (scores - np.min(scores)) / (np.max(scores) - np.min(scores) + 0.000001)
+        new_list_scores.append(new_scores)
 
     result_dict = dict()
     for scores, indices in zip(new_list_scores, list_indices):
-      for score, idx in zip(scores, indices):
-        if not (result_dict.get(idx, False)):
-          result_dict[idx] = score
-        else:
-          result_dict[idx] = result_dict[idx] + score
+        for score, idx in zip(scores, indices):
+            if not (result_dict.get(idx, False)):
+                result_dict[idx] = score
+            else:
+                result_dict[idx] += score
     
     scores, idx_image = [], []
     for idx, score in result_dict.items():
-      idx_image.append(idx)
-      scores.append(score)
+        idx_image.append(idx)
+        scores.append(score)
     
     idx_image = np.array(idx_image).astype(int)
     scores = np.array(scores)
@@ -67,6 +78,19 @@ def merge_searching_results_by_addition(list_scores, list_indices):
     return scores, idx_image
 
 def combined_ranking_score(list_results, topk=None, alpha=0.5, beta=0.5, k=60):
+    '''
+    Computes a combined ranking score for multiple search results based on normalized scores and ranks.
+    
+    Args:
+        list_results (List[Tuple]): List of tuples with scores, indices, frames, paths, ranks, and sources.
+        topk (int, optional): Maximum number of top results to return. Defaults to None.
+        alpha (float): Weight for rank-based component. Defaults to 0.5.
+        beta (float): Weight for score-based component. Defaults to 0.5.
+        k (int): Constant to adjust score contribution. Defaults to 60.
+        
+    Returns:
+        List: Lists of combined scores, image indices, frame indices, image paths, and sources.
+    '''
     df = pd.DataFrame({
         'scores': np.concatenate([item[0] for item in list_results]),
         'idx_image': np.concatenate([item[1] for item in list_results]),
@@ -84,7 +108,7 @@ def combined_ranking_score(list_results, topk=None, alpha=0.5, beta=0.5, k=60):
     else:
         df['normalized_scores'] = (df['scores'] - min_score) / (max_score - min_score)
 
-    df['crs_scores'] = alpha * (1 / (k+df['rank'])) + beta * df['normalized_scores']/ (k+df['rank'])
+    df['crs_scores'] = alpha * (1 / (k + df['rank'])) + beta * df['normalized_scores'] / (k + df['rank'])
     
     df = df.groupby('image_paths').agg({
         'crs_scores': 'sum',
@@ -103,47 +127,36 @@ def combined_ranking_score(list_results, topk=None, alpha=0.5, beta=0.5, k=60):
     return list(df['crs_scores']), list(df["idx_image"]), list(df['frame_idx']), list(df['image_paths']), list(df['source'])
 
 def maximal_marginal_relevance(query_embedding, doc_embeddings, lambda_param=0.5, top_k=5):
-    """
-    Áp dụng thuật toán Maximal Marginal Relevance (MMR) để chọn các kết quả dựa trên tính liên quan và đa dạng.
+    '''
+    Implements Maximal Marginal Relevance (MMR) to select relevant and diverse results.
     
     Args:
-        query_embedding (np.array): Vector embedding của truy vấn.
-        doc_embeddings (np.array): Ma trận embedding của các tài liệu.
-        lambda_param (float): Tham số điều chỉnh giữa tính liên quan và tính đa dạng.
-        top_k (int): Số lượng kết quả trả về.
+        query_embedding (np.array): Embedding vector for the query.
+        doc_embeddings (np.array): Matrix of document embeddings.
+        lambda_param (float): Parameter balancing relevance and diversity. Defaults to 0.5.
+        top_k (int): Number of top results to return. Defaults to 5.
 
     Returns:
-        selected_docs (list): Danh sách chỉ số của các tài liệu đã chọn.
-    """
-    # Tính độ tương đồng cosine giữa truy vấn và các tài liệu
+        list: List of selected document indices.
+    '''
     query_similarities = cosine_similarity([query_embedding], doc_embeddings)[0]
-    
-    # Tính độ tương tự giữa các tài liệu với nhau
     doc_pairwise_similarities = cosine_similarity(doc_embeddings)
     
     selected_docs = []
     candidate_docs = list(range(len(doc_embeddings)))
 
-    # Chọn tài liệu có độ tương đồng lớn nhất với truy vấn làm kết quả đầu tiên
     first_doc = np.argmax(query_similarities)
     selected_docs.append(first_doc)
     candidate_docs.remove(first_doc)
     
-    # Lặp để chọn các tài liệu tiếp theo
     for _ in range(top_k - 1):
         mmr_scores = []
         for doc in candidate_docs:
-            # Độ tương tự của tài liệu với truy vấn (liên quan)
             relevance = query_similarities[doc]
-            
-            # Độ tương tự của tài liệu với những tài liệu đã được chọn (đa dạng)
             diversity = max([doc_pairwise_similarities[doc][selected] for selected in selected_docs])
-            
-            # Tính điểm MMR
             mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
             mmr_scores.append(mmr_score)
         
-        # Chọn tài liệu có điểm MMR cao nhất
         next_doc = candidate_docs[np.argmax(mmr_scores)]
         selected_docs.append(next_doc)
         candidate_docs.remove(next_doc)

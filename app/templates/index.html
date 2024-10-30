@@ -419,9 +419,7 @@
     <script src="{% static 'js/others.js' %}"></script>
     <script src="{% static 'js/jquery_colect.js' %}"></script>
     <script> 
-    // const API_URL = "https://8000--main--nghiavd--nghiasun-coder.trylai.top";
-    const API_URL = '';
-
+    const API_URL = "";
     // info susscess 
     function infoSusscess(text) {
         $(document).ready(function() {
@@ -878,7 +876,7 @@
     const nameQA = document.querySelector('.name-QA');
     const btnSendServer = document.querySelector('#send-server');
     btnSendServer.addEventListener('click', function() {
-        let sessionId = 'NqkYynbdIj_P2a6-5KhiDlSSUiYjW04F';
+        let sessionId = '6iD7TW5hMTjmEIGuKM4vtsqxRzwwD0sO';
         if (nameVideo.value && ptsTime.value) {
             fetch(`https://eventretrieval.one/api/v2/client/evaluation/list?session=${sessionId}`, {
                 method: 'GET',
@@ -1162,7 +1160,7 @@
         const name_frame = frame_path.split('/').pop();
         const id_video = navRight.querySelector('.right-id-video').textContent;
  
-        fetch(`${API_URL}/api/image_search_cluster/`, {
+        fetch(`/api/image_search_cluster/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1232,6 +1230,7 @@
     const rightRecommend = document.querySelector('.right-recommend');
     rightRecommend.addEventListener('click', function(event) {
         if (event.target.closest('.right-enlarge-icon')) {
+            const ptsTimeRight = event.target.closest("")
             const rightImageBlocks = document.querySelectorAll('.right-image-block');
             rightImageBlocks.forEach(block => {
                 block.classList.remove('right-image-block-active');
@@ -1247,7 +1246,7 @@
             const is_extra = image_href.split('/'[-5]);
             const ID_IMAGE = parseInt(imageBlock.querySelector('.id-frame').textContent);
 
-            fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE);
+            fetchClusterFrames(videoId, index_frame, is_extra, ID_IMAGE, ptsTime);
         }else if(event.target.closest('.eye-slash-icon')) {
             const rightImageBlock = event.target.closest('.right-image-block');
             rightImageBlock.remove();
@@ -1269,7 +1268,6 @@
         var spacingX = canvasWidth / (numLines + 1);
         var spacingY = canvasHeight / (numLines + 1);
 
-        // Vẽ các đường thẳng dọc và ngang với nét đứt
         for (var i = 1; i <= numLines; i++) {
             var x = i * spacingX;
             var y = i * spacingY;
@@ -1316,7 +1314,6 @@
         var bbox = [];
         var color = [];
         var tag = [];
-        // lấy colorNames từ local storage
         var colorNames = JSON.parse(localStorage.getItem('colorNames'));
         colorNames = colorNames.map(color => color.toLowerCase());
 
@@ -1407,7 +1404,6 @@
                 e.preventDefault();
                 var inputValue = e.target.value;
         
-                // Create a new rectangle
                 var rect = new fabric.Rect({
                     left: 20,
                     top: 20,
@@ -1460,7 +1456,7 @@
 
     }
 
-    // Hàm xóa đối tượng được chọn
+    // Function to delete selected object
     function deleteSelectedObjects() {
         var activeObjects = canvas.getActiveObjects();
         if (activeObjects.length > 0) {
@@ -1476,7 +1472,7 @@
         logAllObjectsInCanvas();
     }
 
-    // Hàm chọn tất cả các đối tượng icon
+    // The function selects all icon objects
     function selectAllIcons() {
         canvas.discardActiveObject();
         var iconObjects = canvas.getObjects().filter(obj => obj.type === 'image' || obj.isIcon === true  || obj.isTag === true);
@@ -1487,7 +1483,7 @@
         }
     }
 
-    // Hàm sao chép các đối tượng đã chọn
+    // The function copies selected objects
     function copySelectedObjects() {
         var activeObjects = canvas.getActiveObjects();
         if (activeObjects.length > 0) {
@@ -1496,7 +1492,7 @@
         }
     }
 
-    // Hàm dán các đối tượng đã sao chép
+    // Function to paste copied objects
     function pasteCopiedObjects() {
         if (clipboard) {
             clipboard.forEach(clonedObj => {
@@ -1509,7 +1505,7 @@
         }
     }
 
-    // Thêm các sự kiện phím
+    // Add key events
     function setupKeyboardEvents() {
         document.addEventListener('keydown', e => {
             if (e.ctrlKey && e.key === 'a') {
@@ -1527,7 +1523,7 @@
         });
     }
 
-    // Xử lý sự kiện khi click vào nút xóa
+    // Handle the event when clicking on the delete button
     document.querySelector('.canvasCleanItem').addEventListener('click', function() {
         deleteSelectedObjects();
     });

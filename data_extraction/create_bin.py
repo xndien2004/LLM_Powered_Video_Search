@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 feature_shape = 512
-features_dir = r'Data\DataSampleAIC23\clip-features-vit-b32-sample'
+features_dir = './clip-features-vit-b32-sample'
 
 index = faiss.IndexFlatIP(feature_shape)
 
