@@ -15,14 +15,16 @@
 
 <details>
   <summary>Table of Contents</summary>
-- [📍 Overview](#-overview)
-- [🎯 Features](#-features)
-- [🤖 Tech Stack](#-tech-stack)
-- [🚀 Setup and Usage](#-setup-and-usage)
-- [🎬 Demo](#-demo)
-- [👣 Workflow](#-workflow)
-- [📐 App Structure](#-app-structure)
-- [🧑‍💻 Contributors](#-contributors)
+
+  - [📍 Overview](#-overview)
+  - [🎯 Features](#-features)
+  - [🤖 Tech Stack](#-tech-stack)
+  - [🚀 Setup and Usage](#-setup-and-usage)
+  - [🎬 Demo](#-demo)
+  - [👣 Workflow](#-workflow)
+  - [📐 App Structure](#-app-structure)
+  - [🧑‍💻 Contributors](#-contributors)
+
 </details>
 
 ## 📍 Overview 
@@ -113,7 +115,7 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
 │   │   ├── migrations/
 │   │   ├── static/
 │   │   ├── templates/
-│   │   ├── viewAPI.py
+│   │   ├── viewAPI.py 
 │   ├── data_extraction/
 │   │   ├── TransnetV2/
 │   │   ├── audio/
@@ -125,6 +127,9 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
 │   ├── utils/
 │       ├── LLM/
 │       ├── video_retrieval/
+│       ├── faiss_search.py
+│       ├── combine_search.py
+|       |...
 ```
 
 ## 🧑‍💻 Contributors
