@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="./figs/image/AIC2024-Banner.png" width="1080">
-</p>
-
-<h1 align="center"> 🧠 LLM-Powered Video Search System for AIC2024 </h1>
+<h1 align="center"> 🧠 LLM-Powered Video Search: A Comprehensive Multimedia Retrieval System </h1>
 
 <p align="center">
   <em>An intelligent video retrieval system leveraging Large Language Models (LLMs) and multimodal search, developed for the AIC2024 competition and accepted at the international SOICT 2024 conference.</em>
