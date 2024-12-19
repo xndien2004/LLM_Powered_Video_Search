@@ -1,4 +1,4 @@
-<h1 align="center"> 🧠 LLM-Powered Video Search: A Comprehensive Multimedia Retrieval System </h1>
+##🧠 LLM-Powered Video Search: A Comprehensive Multimedia Retrieval System
 
 <p align="center">
   <em>An intelligent video retrieval system leveraging Large Language Models (LLMs) and multimodal search, developed for the AIC2024 competition and accepted at the international SOICT 2024 conference.</em>
