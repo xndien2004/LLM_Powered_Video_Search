@@ -70,8 +70,6 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
    You can download the dataset from [Google Drive](https://drive.google.com/drive/folders/17Yab4iMAEzok0pO_czgbAkKBlaQ2ptqU) or [Kaggle](https://www.kaggle.com/datasets/tienanh2003/keyframes-v1-aic2024).
 
    Media for the app should be stored in the `media` directory. The structure should be as follows:
-   <details>
-   <summary>Media format</summary>
    ```
    media/
    ├── contexts_bin/
@@ -117,7 +115,6 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
    ├── map-asr.json
 
    ```
-   </details>
 
 4. **Verify Paths in `viewAPI.py`**
    Ensure paths in `app/viewAPI.py` are correct.
