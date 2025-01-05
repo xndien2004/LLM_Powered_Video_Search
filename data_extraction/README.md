@@ -1,7 +1,7 @@
 # Data extraction
---- 
+
 ## Pipeline
-![Data Processing](./figs/image/data_processing.png)
+![Data Processing](../figs/image/data_processing.png)
 ---
 
 ## Data directory 
