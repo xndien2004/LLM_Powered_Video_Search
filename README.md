@@ -69,52 +69,7 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
    ```
    You can download the dataset from [Google Drive](https://drive.google.com/drive/folders/17Yab4iMAEzok0pO_czgbAkKBlaQ2ptqU) or [Kaggle](https://www.kaggle.com/datasets/tienanh2003/keyframes-v1-aic2024).
 
-   Media for the app should be stored in the `media` directory. The structure should be as follows:
-   ```
-   media/
-   ├── contexts_bin/
-   │   ├── npz/
-   │   │   ├── sparse_context_matrix_asr.npz
-   │   │   ├── sparse_context_matrix_caption.npz
-   │   │   ├── sparse_context_matrix_number_tag.npz
-   │   │   ├── sparse_context_matrix_number.npz
-   │   │   ├── sparse_context_matrix_ocr.npz
-   │   │   ├── sparse_context_matrix_synthetic.npz
-   │   │   ├── sparse_context_matrix_tag.npz
-   │   ├── pkl/
-   │   │   ├── tfidf_transform_asr.pkl
-   │   │   ├── tfidf_transform_caption.pkl
-   │   │   ├── tfidf_transform_number_tag.pkl
-   │   │   ├── tfidf_transform_number.pkl
-   │   │   ├── tfidf_transform_ocr.pkl
-   │   │   ├── tfidf_transform_synthetic.pkl
-   │   │   ├── tfidf_transform_tag.pkl
-   ├── faiss/
-   │   ├── faiss_openclip.bin
-   │   ├── ...
-   ├── Keyframes/
-   │   ├── Keyframes_L01/keyframes/
-   │   │   ├── L01_V001/
-   │   │   │   ├── 001.jpg
-   │   │   │   ├── 002.jpg
-   │   │   │   ├── ...
-   │   ├── ...
-   ├── map-keyframes/
-   │   ├── L01_V001.csv
-   │   ├── L01_V002.csv
-   │   ├── ...
-   ├── media-info/
-   │   ├── L01_V001.json
-   │   ├── L01_V002.json
-   │   ├── ...
-   ├── tag/
-   │   ├── tag_corpus.txt
-   ├── id2img_fps_extra.json
-   ├── id2img_fps.json
-   ├── id2video.json
-   ├── map-asr.json
-
-   ```
+   Media for the app should be stored in the `media` directory. For more detailed instructions, check the [Media format](./app/README.md) 
 
 4. **Verify Paths in `viewAPI.py`**
    Ensure paths in `app/viewAPI.py` are correct.
