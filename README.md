@@ -132,6 +132,6 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
 
 ## 🧑‍💻 Contributors
 
-- [Trần Xuân Diện](https://github.com/dienlamAI)
+- [Trần Xuân Diện](https://github.com/xndien2004)
 - [Hoàng Tiến Anh](https://github.com/HTAnh2003)
 - [Dương Văn Tài](https://github.com/TaiDuongRepo)
