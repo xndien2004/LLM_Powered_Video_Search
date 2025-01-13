@@ -77,8 +77,8 @@ dict_path_extra = {
     'dict_npz_tag_path': '/npz_extra/sparse_context_matrix_tag.npz'
 }
 
-key_api = "./key_gpt.txt"
-keyword = "utils/keyword.txt"
+key_api = MEDIA_ROOT+"/key_gpt.txt"
+keyword = MEDIA_ROOT+"/keyword.txt"
 
 # load file
 is_extra = "no" # ["no", "yes", "both"]
@@ -97,7 +97,7 @@ elif is_extra == "both":
 media_info = media_info_retrieval.MediaInfoRetrieval(dict_path["id2video_json_path"], dict_path['dict_pkl_media_info_path'], dict_path['dict_npz_media_info_path'])
 
 # LLM
-llm_auto = llm_retrieval.QueryProcessor(api_key_path=key_api)
+# llm_auto = llm_retrieval.QueryProcessor(api_key_path=key_api)
 
 # API 
 class Objects(APIView):
