@@ -20,6 +20,7 @@
   - [👣 Workflow](#-workflow)
   - [📐 App Structure](#-app-structure)
   - [🧑‍💻 Contributors](#-contributors)
+  - [📚 Citation](#-citation)
 
 </details>
 
@@ -135,3 +136,22 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
 - [Trần Xuân Diện](https://github.com/xndien2004)
 - [Hoàng Tiến Anh](https://github.com/HTAnh2003)
 - [Dương Văn Tài](https://github.com/TaiDuongRepo)
+
+## 📚 Citation
+If you use this system in your research or publications, please cite it using the following format:
+
+```bibtex
+@InProceedings{10.1007/978-981-96-4291-5_25,
+  author    = {Tran, Dien X. and Hoang, Anh T. and Duong, Tai V. and Nguyen, Kien C.},
+  editor    = {Buntine, Wray and Fjeld, Morten and Tran, Truyen and Tran, Minh-Triet and Huynh Thi Thanh, Binh and Miyoshi, Takumi},
+  title     = {LLM-Powered Video Search: A Comprehensive Multimedia Retrieval System},
+  booktitle = {Information and Communication Technology},
+  year      = {2025},
+  publisher = {Springer Nature Singapore},
+  address   = {Singapore},
+  pages     = {305--315},
+  isbn      = {978-981-96-4291-5}
+}
+```
+
+
