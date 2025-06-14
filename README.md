@@ -25,7 +25,7 @@
 </details>
 
 ## 📍 Overview 
-The `LLM-Powered Video Search System` is an advanced multimodal video search solution that leverages Large Language Models (LLMs) to enhance video retrieval through text, image, and metadata queries. This project was developed for the [AIC2024](https://aichallenge.hochiminhcity.gov.vn/) competition and has been accepted at the international [SOICT 2024](https://soict.org/) conference, aiming to provide an intelligent and efficient video search system. Details about the paper can be found on [Springer](https://www.springer.com/).
+The `LLM-Powered Video Search System` is an advanced multimodal video search solution that leverages Large Language Models (LLMs) to enhance video retrieval through text, image, and metadata queries. This project was developed for the [AIC2024](https://aichallenge.hochiminhcity.gov.vn/) competition and has been accepted at the international [SOICT 2024](https://soict.org/) conference, aiming to provide an intelligent and efficient video search system. Details about the paper can be found on [Springer](https://link.springer.com/chapter/10.1007/978-981-96-4291-5_25).
 
 ## 🎯 Features
 
