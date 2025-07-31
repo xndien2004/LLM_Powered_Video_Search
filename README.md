@@ -52,7 +52,7 @@ The `LLM-Powered Video Search System` is an advanced multimodal video search sol
 1. **Clone Repository**
    ```bash
    git clone https://github.com/xndien2004/LLM_Powered_Video_Search.git
-   cd AIC2024
+   cd LLM_Powered_Video_Search
    ```
 
 2. **Install Dependencies**
