@@ -1,8 +1,6 @@
 # LLM-Powered Video Search: A Comprehensive Multimedia Retrieval System
 
-<p align="center">
-  <em>An intelligent video retrieval system leveraging Large Language Models (LLMs) and multimodal search, developed for the AIC2024 competition and accepted at the international SOICT 2024 conference.</em>
-</p>
+<p align="center"> <em>An intelligent video retrieval system that leverages Large Language Models (LLMs) and multimodal search techniques. Originally developed for the AIC2024 competition and accepted at the international SOICT 2024 conference.</em> </p> <p align="center"> ⭐ If you find this project helpful or interesting, please consider giving it a star - your support means a lot! </p>
 
 ![Static Badge](https://img.shields.io/badge/python->=3.10-blue)
 ![Static Badge](https://img.shields.io/badge/django-3.x-blue)
